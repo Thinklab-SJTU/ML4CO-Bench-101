@@ -1,0 +1,62 @@
+# pycache
+*.DS_Store
+*__pycache__
+**/__pycache__/*
+__pycache__/
+**/__pycache__/**
+
+# .zip or .gz
+*.zip
+*.gz
+
+# C extensions
+*.pyd
+*.so
+*.o
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# datasets
+dataset/**
+test_dataset/**
+train_dataset/**
+data/**
+
+# tmp
+tmp/**
+tmp.py
+repos/**
+*.out
+
+# coverage
+coverage.xml
+.coverage
+
+# train
+log/**
+train_ckpts/**
+weights/**
+wandb/**
+**/weights/**
+
+# history
+his/**
