@@ -84,7 +84,8 @@ We use ``hugging-face`` to store our train-datasets. Please download them [here]
 | ``gnn4co``      | ``GP4CO`` | ``GP-OS-SL``   | ✔ | ✔ | -- | ✔ | ✔ | ✔ | ✔ |
 | ``dimes``       | ``GP4CO`` | ``GP-OS-MAML`` | ✔ | -- | -- | -- | -- | -- | -- |
 | ``meta_egn``    | ``GP4CO`` | ``GP-OS-MAML`` | -- | -- | -- | ✔ | ✔ | ✔ | ✔ |
-| ``utsp``        | ``GP4CO`` | ``GP-OS-UL``   | -- | -- | -- | ✔ | ✔ | ✔ | ✔ |
+| ``utsp``        | ``GP4CO`` | ``GP-OS-UL``   | ✔ | -- | -- | -- | -- | -- | -- |
+| ``vag_co``      | ``GP4CO`` | ``GP-OS-UL``   | -- | -- | -- | ✔ | ✔ | ✔ | ✔ |
 | ``consistency`` | ``GP4CO`` | ``GP-Gen-SL``  | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | ``goal``        | ``LC4CO`` | ``LC-OS-SL``   | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | -- |
 | ``matnet``      | ``LC4CO`` | ``LC-OS-RL``   | -- | ✔ | -- | -- | -- | -- | -- |
