@@ -13,10 +13,10 @@ SPARSE_FACTOR = -1
 # COExpander Settings
 INFERENCE_STEP = 5 # Is
 DETERMINATE_STEP = 3 # Ds
-SAMPLING_NUM = 4 # S
+SAMPLING_NUM = 1 # S
 
 # Local Search Settings
-USE_2OPT = True
+USE_2OPT = False
 
 # Test File & Pretrained Settings
 TEST_FILE_DICT = {

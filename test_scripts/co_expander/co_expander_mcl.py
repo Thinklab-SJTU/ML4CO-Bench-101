@@ -7,13 +7,13 @@ sys.path.append(sub_folder)
 from ml4co.co_expander import *
 
 # Problem Settings
-TEST_TYPE = "RB-GIANT"
+TEST_TYPE = "RB-SMALL"
 
 # COExpander Settings
 INFERENCE_STEP = 1 # Is
-DETERMINATE_STEP = 1 # Ds
+DETERMINATE_STEP = 20 # Ds
 SAMPLING_NUM = 1 # S
-BEAM_SIZE = 16 # Beam Search
+BEAM_SIZE = -1 # Beam Search
 
 # Local Search Settings
 USE_RLSA = False
