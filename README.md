@@ -79,17 +79,17 @@ We use ``hugging-face`` to store our train-datasets. Please download them [here]
 
 **Repetition of DiffUCO :** Due to the incompatibility of the underlying technology, please visit the original repository [here](https://github.com/ml-jku/DIffUCO) to reproduce the experiment.
 
-|   Past Method   |   Solver & Type    | TSP | ATSP | CVRP | MIS | MCl | MVC | MCut |
-| :-------------- | :----------------- | :-: | :--: | :--: | :-: | :-: | :-: | :--: |
-| ``gnn4co``      | GP4CO (GP-OS-SL)   | ✔ | ✔ | -- | ✔ | ✔ | ✔ | ✔ |
-| ``dimes``       | GP4CO (GP-OS-MAML) | ✔ | -- | -- | -- | -- | -- | -- |
-| ``meta_egn``    | GP4CO (GP-OS-MAML) | -- | -- | -- | ✔ | ✔ | ✔ | ✔ |
-| ``utsp``        | GP4CO (GP-OS-UL)   | -- | -- | -- | ✔ | ✔ | ✔ | ✔ |
-| ``consistency`` | GP4CO (GP-Gen-SL)  | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
-| ``goal``        | LC4CO (LC-OS-SL)   | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | -- |
-| ``matnet``      | LC4CO (LC-OS-RL)   | -- | ✔ | -- | -- | -- | -- | -- |
-| ``symnco``      | LC4CO (LC-OS-RL)   | ✔ | -- | ✔ | -- | -- | -- | -- |
-| ``co_expander`` | AE4CO (AE-Gen-SL)  | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+|   Past Method   |   Solver  |      Type      | TSP | ATSP | CVRP | MIS | MCl | MVC | MCut |
+| :-------------- | :-------- | :------------- | :-: | :--: | :--: | :-: | :-: | :-: | :--: |
+| ``gnn4co``      | ``GP4CO`` | ``GP-OS-SL``   | ✔ | ✔ | -- | ✔ | ✔ | ✔ | ✔ |
+| ``dimes``       | ``GP4CO`` | ``GP-OS-MAML`` | ✔ | -- | -- | -- | -- | -- | -- |
+| ``meta_egn``    | ``GP4CO`` | ``GP-OS-MAML`` | -- | -- | -- | ✔ | ✔ | ✔ | ✔ |
+| ``utsp``        | ``GP4CO`` | ``GP-OS-UL``   | -- | -- | -- | ✔ | ✔ | ✔ | ✔ |
+| ``consistency`` | ``GP4CO`` | ``GP-Gen-SL``  | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| ``goal``        | ``LC4CO`` | ``LC-OS-SL``   | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | -- |
+| ``matnet``      | ``LC4CO`` | ``LC-OS-RL``   | -- | ✔ | -- | -- | -- | -- | -- |
+| ``symnco``      | ``LC4CO`` | ``LC-OS-RL``   | ✔ | -- | ✔ | -- | -- | -- | -- |
+| ``co_expander`` | ``AE4CO`` | ``AE-Gen-SL``  | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 
 ## 🚀 Gettiing Started
 
