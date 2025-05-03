@@ -23,7 +23,7 @@ class MetaEGNMClSolver(MClSolver):
         
     def solve(self, batch_size: int = 1, show_time: bool = False):
         # timer
-        timer = Timer()
+        timer = Timer(apply=show_time)
         timer.start()        
         
         # solve

@@ -21,13 +21,9 @@ class MatNetATSPSolver(ATSPSolver):
         self.beam_size = beam_size
         self.use_2opt = use_2opt
         
-    def solve(
-        self,
-        batch_size: int = 1, 
-        show_time: bool = False
-    ):
+    def solve(self, batch_size: int = 1, show_time: bool = False):
         # timer
-        timer = Timer()
+        timer = Timer(apply=show_time)
         timer.start()
         
         # solve
