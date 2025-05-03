@@ -69,7 +69,10 @@ gcc ./dimes_greedy_dense.c -o dense_greedy.so -fPIC -shared
 
 > **Step1: test-datasets and pretrained weights**
 
-We use ``google drive`` to store our test-datasets and pre-trained files. Please download them [here](https://drive.google.com/drive/folders/1pfgq3hvG6tnwxiDvTBcg7fgcCnLihgaE?usp=drive_link).
+We use ``google drive`` to store our test-datasets and pre-trained files. 
+
+* Please download test-datasets [here](https://drive.google.com/drive/folders/1d7pMissm8r6C0lNP0380zu3o505HN4PC?usp=drive_link)
+* Please download pre-trained files [here](https://drive.google.com/drive/folders/1DWWE-pVGgNJTNiXj2PADMT5q7SKbx0Hd?usp=drive_link).
 
 > **Step2: train-datasets**
 
