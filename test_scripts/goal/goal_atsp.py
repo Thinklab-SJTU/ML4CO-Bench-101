@@ -7,11 +7,11 @@ sys.path.append(sub_folder)
 from ml4co.goal import *
 
 # Problem Settings
-NODES_NUM = 200
+NODES_NUM = 50
 KNNS = -1
 
 # GOAL Settings
-BEAM_SIZE = 16
+BEAM_SIZE = -1
 
 # Local Search Settings
 USE_2OPT = True

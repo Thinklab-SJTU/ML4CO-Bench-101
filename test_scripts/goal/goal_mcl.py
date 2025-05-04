@@ -7,7 +7,7 @@ sys.path.append(sub_folder)
 from ml4co.goal import *
 
 # Problem Settings
-TEST_TYPE = "RB-GIANT"
+TEST_TYPE = "RB-SMALL"
 
 # GOAL Settings
 BEAM_SIZE = -1

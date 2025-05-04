@@ -34,18 +34,17 @@ pip install --no-index torch-scatter -f https://pytorch-geometric.com/whl/torch-
 pip install --no-index torch-sparse -f https://pytorch-geometric.com/whl/torch-2.0.1+cu117.html
 pip install --no-index torch-spline-conv -f https://pytorch-geometric.com/whl/torch-2.0.1+cu117.html
 pip install --no-index torch-cluster -f https://pytorch-geometric.com/whl/torch-2.0.1+cu117.html
-pip install wandb==0.16.3
-pip install pytorch-lightning==2.0.1
-pip install ml4co-kit==0.3.2
 ```
 
-> **Step3: install ``pytorch-lightning`` and ``WandB``.**
+> **Step3: install ``pytorch-lightning``, ``tensordict``, ``WandB``, etc.**
 
-The overall training framework of ``ML4CO-101`` is based on [``pytorch-lightning``](https://github.com/Lightning-AI/pytorch-lightning) and [``wandb``](https://github.com/wandb/wandb). Please install the corresponding packages.
+The overall training framework of ``ML4CO-101`` is based on [``pytorch-lightning``](https://github.com/Lightning-AI/pytorch-lightning), [``tensordict``](https://github.com/pytorch/tensordict) and [``wandb``](https://github.com/wandb/wandb). Please install the corresponding packages.
 
 ```bash
 pip install wandb==0.16.3 # >=0.16.3
+pip install tensordict==0.2.0 # >=0.2.0
 pip install pytorch-lightning==2.0.1 # consistent with the PyTorch version
+pip install einops==0.8.0 # >=0.8.0
 ```
 
 > **Step4: install ``ML4CO-Kit``**

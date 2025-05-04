@@ -11,7 +11,7 @@ NODES_NUM = 50
 KNNS = -1
 
 # Solving Settings
-BEAM_SIZE = 16
+BEAM_SIZE = -1
 
 # Local Search Settings
 USE_2OPT = False

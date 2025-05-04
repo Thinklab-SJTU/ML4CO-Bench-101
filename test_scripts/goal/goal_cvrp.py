@@ -7,10 +7,16 @@ sub_folder = os.path.join(root_folder, "ml4co")
 sys.path.append(sub_folder)
 from ml4co.goal import *
 
-# settings
-NODES_NUM = 100
+# Problem Settings
+NODES_NUM = 50
+
+# GOAL Settings
 BEAM_SIZE = -1
+
+# Local Search Settings
 USE_LOCAL_SEARCH = False
+
+# Test File & Pretrained Settings
 TEST_FILE_DICT = {
     50: "test_dataset/cvrp/cvrp50_hgs-1s_10.366.txt",
     100: "test_dataset/cvrp/cvrp100_hgs-20s_15.563.txt",
@@ -24,7 +30,7 @@ WEIGHT_PATH_DICT = {
     500: "weights/goal/goal_cvrp500.pt",
 }
 
-# main
+# Main
 if __name__ == "__main__":
     solver = GOALCVRPSolver(
         model=GOALModel(
