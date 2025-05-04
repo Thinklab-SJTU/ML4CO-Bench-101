@@ -23,17 +23,17 @@ nvcc -V
 
 > **Step2: install the ``pytorch`` environment with ``cuda``**
 
-Note that you should install ``pytorch`` and related extension packages with the same major version number as your CUDA driver. You can find the quick installation wheels [here](https://pytorch-geometric.com/whl). The following is an installation script for ``python-3.8``, ``pytorch-2.0.1``, and ``cuda-11.7``.
+Note that you should install ``pytorch`` and related extension packages with the same major version number as your CUDA driver. You can find the quick installation wheels [here](https://pytorch-geometric.com/whl). The following is an installation script for ``python-3.8``, ``pytorch-2.1.0``, and ``cuda-12.1``.
 
 ```bash
 conda create --name ml4co python=3.8
 conda activate ml4co
-pip install torch==2.0.1
+pip install torch==2.1.0
 pip install scipy==1.10.1
-pip install --no-index torch-scatter -f https://pytorch-geometric.com/whl/torch-2.0.1+cu117.html
-pip install --no-index torch-sparse -f https://pytorch-geometric.com/whl/torch-2.0.1+cu117.html
-pip install --no-index torch-spline-conv -f https://pytorch-geometric.com/whl/torch-2.0.1+cu117.html
-pip install --no-index torch-cluster -f https://pytorch-geometric.com/whl/torch-2.0.1+cu117.html
+pip install --no-index torch-scatter -f https://pytorch-geometric.com/whl/torch-2.1.0+cu121.html
+pip install --no-index torch-sparse -f https://pytorch-geometric.com/whl/torch-2.1.0+cu121.html
+pip install --no-index torch-spline-conv -f https://pytorch-geometric.com/whl/torch-2.1.0+cu121.html
+pip install --no-index torch-cluster -f https://pytorch-geometric.com/whl/torch-2.1.0+cu121.html
 ```
 
 > **Step3: install ``pytorch-lightning``, ``tensordict``, ``WandB``, etc.**
@@ -43,7 +43,7 @@ The overall training framework of ``ML4CO-101`` is based on [``pytorch-lightning
 ```bash
 pip install wandb==0.16.3 # >=0.16.3
 pip install tensordict==0.2.0 # >=0.2.0
-pip install pytorch-lightning==2.0.1 # consistent with the PyTorch version
+pip install pytorch-lightning==2.1.0 # consistent with the PyTorch version
 pip install einops==0.8.0 # >=0.8.0
 ```
 
@@ -64,6 +64,8 @@ cd model/decoder
 gcc ./dimes_greedy_dense.c -o dense_greedy.so -fPIC -shared
 ```
 
+**Note:** For ``LwD``, you need to install [``dgl``](https://github.com/dmlc/dgl), which provides convenient wheels [here](https://www.dgl.ai/pages/start.html).
+
 ## ⚡ Datasets and Pretrained Files
 
 > **Step1: test-datasets and pretrained weights**
@@ -80,6 +82,8 @@ We use ``hugging-face`` to store our train-datasets. Please download them [here]
 ## 📝 Algorithm Design Correspondence Table
 
 **Repetition of DiffUCO :** Due to the incompatibility of the underlying technology, please visit the original repository [here](https://github.com/ml-jku/DIffUCO) to reproduce the experiment.
+
+**Repetition of LwD :** Due to the incompatibility of the underlying technology, please visit the original repository [here](https://github.com/sungsoo-ahn/learning_what_to_defer) to reproduce the experiment, and we provide the pretrained file for ``ER-700-800`` [here](https://drive.google.com/file/d/1yrPdYrBE0D5Z4JaD7fG20IYDIFG5KOCM/view?usp=drive_link). 
 
 |   Past Method   |   Solver  |      Type      | TSP | ATSP | CVRP | MIS | MCl | MVC | MCut |
 | :-------------- | :-------: | :-----------:  | :-: | :--: | :--: | :-: | :-: | :-: | :--: |
