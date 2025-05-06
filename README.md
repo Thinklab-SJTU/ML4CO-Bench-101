@@ -72,12 +72,20 @@ gcc ./dimes_greedy_dense.c -o dense_greedy.so -fPIC -shared
 
 We use ``google drive`` to store our test-datasets and pre-trained files. 
 
-* Please download test-datasets [here](https://drive.google.com/drive/folders/1d7pMissm8r6C0lNP0380zu3o505HN4PC?usp=drive_link)
+* Please download test-datasets [here](https://drive.google.com/drive/folders/1d7pMissm8r6C0lNP0380zu3o505HN4PC?usp=drive_link) or [here](https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/main/test_dataset).
 * Please download pre-trained files [here](https://drive.google.com/drive/folders/1DWWE-pVGgNJTNiXj2PADMT5q7SKbx0Hd?usp=drive_link).
 
 > **Step2: train-datasets**
 
 We use ``hugging-face`` to store our train-datasets. Please download them [here](https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/main/train_dataset).
+
+
+> **ML4CO-Bench-101 Results**
+
+We find that the ML4CO method outperform traditional solvers on some benchmark datasets. Besides, most neural methods achieved an advantage in speed. For the better future development of the community, we have for the first time released the ML4CO solution result dataset for the all benchmark datasets. The results are shown in the table below, and you can download the dataset [here](https://drive.google.com/drive/folders/1RfA6hr0896uihnOVtA6CsN0XjqRUMBA-?usp=sharing) or [here](https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/main/ml4co_result).
+
+<img src="assets/performance.png" alt="Organization" width="800"/>
+
 
 ## 📝 Algorithm Design Correspondence Table
 

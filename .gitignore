@@ -40,6 +40,7 @@ dataset/**
 test_dataset/**
 train_dataset/**
 data/**
+ml4co_result/**
 
 # tmp
 tmp/**

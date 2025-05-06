@@ -16,7 +16,7 @@ DETERMINATE_STEP = 3 # Ds
 SAMPLING_NUM = 1 # S
 
 # Local Search Settings
-USE_2OPT = False
+USE_2OPT = True
 
 # Test File & Pretrained Settings
 TEST_FILE_DICT = {
@@ -53,3 +53,4 @@ if __name__ == "__main__":
     solver.from_txt(TEST_FILE_DICT[NODES_NUM], ref=True)
     solver.solve(sampling_num=SAMPLING_NUM, show_time=True)
     print(solver.evaluate(calculate_gap=True))
+    solver.to_txt("tsp1000_ml4co.txt")
