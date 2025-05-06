@@ -8,14 +8,14 @@ from ml4co.gnn4co import *
 
 # Problem Settings
 NODES_NUM = 50
-SPARSE_FACTOR = -1
+SPARSE_FACTOR = -1 # 50 for TSP-500 and TSP-10K, 100 for TSP-1K
 
 # Solving Settings
-SOLVING_SETTINGS = ("greedy", "2opt")
+SOLVING_SETTINGS = ("greedy", None) # ("greedy", "2opt"), ("greedy", "mcts"), ("random_mcts", None), ("mcts", None)
 
 # Local Search Settings
 MCTS_TIME_LIMIT = 0.05 # 0.05 for TSP50 and TSP100; 1 for TSP500 and TSP1K; 5 for TSP10K
-MCTS_TYPE_FLAG = 2 # 2 for TSP50 and TSP100; 1 for TSP500, TSP1K and TSP10K
+MCTS_TYPE_FLAG = 2 # 2 for TSP50 and TSP100; 1 for TSP500, TSP1K and TSP10K, 1 for random_mcts
 
 # Test File & Pretrained Settings
 TEST_FILE_DICT = {

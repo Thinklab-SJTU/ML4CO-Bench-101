@@ -62,7 +62,7 @@ PROBLEMS = [
 
 # COExpander Settings
 INFERENCE_STEP = 5 # Is
-DETERMINATE_STEP = 3 # Ds
+DETERMINATE_STEP = 1 # Ds
 SAMPLING_NUM = 4 # S
 
 # Local Search Settings

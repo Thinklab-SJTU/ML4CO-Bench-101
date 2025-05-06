@@ -17,11 +17,11 @@ SAMPLING_NUM = 1 # S
 # Local Search Settings
 USE_RLSA = False
 RLSA_SETTINGS_DICT = {
-    "RB-SMALL": (0.01, 2, 1000, 1000, 1.02, 0.2),
-    "RB-LARGE": (0.01, 2, 1000, 1000, 1.02, 0.2),
-    "RB-GIANT": (0.01, 2, 1000, 1000, 1.02, 0.2),
-    "TWITTER": (0.01, 2, 1000, 200, 4.0, 0.2),
-    "COLLAB": (0.01, 2, 1000, 300, 1.02, 0.2)
+    "RB-SMALL": (0.01, 2, 1000, 1000, 1.02, 0.3),
+    "RB-LARGE": (0.01, 2, 1000, 1000, 1.02, 0.3),
+    "RB-GIANT": (0.01, 2, 1000, 1000, 1.02, 0.3),
+    "TWITTER": (0.01, 2, 1000, 200, 4.0, 0.3),
+    "COLLAB": (0.01, 2, 1000, 300, 1.02, 0.3)
 }
 
 # Test File & Pretrained Settings

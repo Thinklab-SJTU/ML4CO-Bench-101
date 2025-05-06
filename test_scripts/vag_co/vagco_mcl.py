@@ -10,7 +10,7 @@ from ml4co.vag_co import *
 TEST_TYPE = "RB-SMALL"
 
 # Solving Settings
-SOLVING_SETTINGS = ("greedy", "rlsa")
+SOLVING_SETTINGS = ("greedy", None) # ("greedy", "rlsa") / ("beam", None) / ("beam", "rlsa")
 
 # Local Search Settings
 RLSA_SETTINGS_DICT = {

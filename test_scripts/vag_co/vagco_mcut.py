@@ -10,13 +10,13 @@ from ml4co.vag_co import *
 TEST_TYPE = "BA-GIANT"
 
 # Solving Settings
-SOLVING_SETTINGS = ("greedy", None)
+SOLVING_SETTINGS = ("greedy", None) # ("greedy", "rlsa")
 
 # Local Search Settings
 RLSA_SETTINGS_DICT = {
-    "BA-SMALL": (0.01, 20, 1000, 1000),
-    "BA-LARGE": (1, 100, 1000, 1000),
-    "BA-GIANT": (1, 200, 1000, 1000)
+    "BA-SMALL": (1, 20, 1000, 1000),
+    "BA-LARGE": (1, 50, 1000, 1000),
+    "BA-GIANT": (1, 100, 1000, 1000)
 }
 
 # Test File & Pretrained Settings

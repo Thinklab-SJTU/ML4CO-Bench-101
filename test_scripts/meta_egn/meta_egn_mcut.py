@@ -12,9 +12,9 @@ TEST_TYPE = "BA-SMALL"
 # Local Search Settings
 USE_RLSA = False
 RLSA_SETTINGS_DICT = {
-    "BA-SMALL": (0.01, 20, 1000, 1000),
-    "BA-LARGE": (1, 100, 1000, 1000),
-    "BA-GIANT": (1, 200, 1000, 1000)
+    "BA-SMALL": (1, 20, 1000, 1000, 0.3),
+    "BA-LARGE": (1, 50, 1000, 1000, 0.3),
+    "BA-GIANT": (1, 100, 1000, 1000, 0.3)
 }
 
 # Test File & Pretrained Settings

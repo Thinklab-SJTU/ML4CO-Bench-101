@@ -11,11 +11,11 @@ from ml4co.utsp import *
 NODES_NUM = 50
 
 # Solving Settings
-SOLVING_SETTINGS = ("mcts", None)
+SOLVING_SETTINGS = ("greedy", None) # ("greedy", "2opt"), ("greedy", "mcts"), ("random_mcts", None), ("mcts", None)
 
 # Local Search Settings
-MCTS_TIME_LIMIT = 0.05 # 0.05 for TSP50 and TSP100; 1 for TSP500 and TSP1K
-MCTS_TYPE_FLAG = 2 # 2 for TSP50 and TSP100; 1 for TSP500, TSP1K
+MCTS_TIME_LIMIT = 0.05 # 0.05 for TSP50 and TSP100; 1 for TSP500 and TSP1K; 5 for TSP10K
+MCTS_TYPE_FLAG = 2 # 2 for TSP50 and TSP100; 1 for TSP500, TSP1K and TSP10K, 1 for random_mcts
 
 # Test File & Pretrained Settings
 TEST_FILE_DICT = {

@@ -16,7 +16,7 @@ SAMPLING_NUM = 1 # S
 BEAM_SIZE = -1 # Beam Search
 
 # Local Search Settings
-USE_RLSA = True
+USE_RLSA = False
 RLSA_SETTINGS_DICT = {
     "RB-SMALL": (0.01, 2, 200, 50, 1.02, 0.3),
     "RB-LARGE": (0.01, 2, 200, 200, 1.02, 0.3),

@@ -10,15 +10,15 @@ from ml4co.gnn4co import *
 TEST_TYPE = "RB-SMALL"
 
 # Solving Settings
-SOLVING_SETTINGS = ("greedy", None)
+SOLVING_SETTINGS = ("greedy", None) # ("greedy", "rlsa")
 
 # Local Search Settings
 RLSA_SETTINGS_DICT = {
-    "RB-SMALL": (0.01, 2, 1000, 1000, 1.02, 0.2),
-    "RB-LARGE": (0.01, 2, 1000, 1000, 1.02, 0.2),
-    "RB-GIANT": (0.01, 2, 1000, 1000, 1.02, 0.2),
-    "TWITTER": (0.01, 2, 1000, 200, 4.0, 0.2),
-    "COLLAB": (0.01, 2, 1000, 300, 1.02, 0.2)
+    "RB-SMALL": (0.01, 2, 1000, 1000, 1.02, 0.3),
+    "RB-LARGE": (0.01, 2, 1000, 1000, 1.02, 0.3),
+    "RB-GIANT": (0.01, 2, 1000, 1000, 1.02, 0.3),
+    "TWITTER": (0.01, 2, 1000, 200, 4.0, 0.3),
+    "COLLAB": (0.01, 2, 1000, 300, 1.02, 0.3)
 }
 
 # Test File & Pretrained Settings
@@ -26,7 +26,7 @@ TEST_FILE_DICT = {
     "RB-SMALL": "test_dataset/mvc/mvc_rb-small_gurobi-60s_205.764.txt",
     "RB-LARGE": "test_dataset/mvc/mvc_rb-large_gurobi-300s_968.228.txt",
     "RB-GIANT": "test_dataset/mvc/mvc_rb-giant_gurobi-3600s_2396.780.txt",
-    "TWITTER": "test_dataset/mvc/mvc_twitter_gurobi-60s_85.253.txt",
+    "TWITTER": "test_dataset/mvc/mvc_twitter_gurobi-60s_85.251.txt",
     "COLLAB": "test_dataset/mvc/mvc_collab_gurobi-60s_65.086.txt"
 }
 WEIGHT_PATH_DICT = {

@@ -64,10 +64,6 @@ PROBLEMS = [
 SOLVING_SETTINGS = ("greedy", "mcts")
 
 # Local Search Settings
-MCTS_TIME_LIMIT = 0.05 # 0.05 for TSP50 and TSP100; 1 for TSP500 and TSP1K; 5 for TSP10K
-MCTS_TYPE_FLAG = 2 # 2 for TSP50 and TSP100; 1 for TSP500, TSP1K and TSP10K
-
-# Local Search Settings
 USE_2OPT = True
 
 # Test File & Pretrained Settings

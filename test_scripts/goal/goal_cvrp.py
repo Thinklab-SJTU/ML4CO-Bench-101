@@ -14,7 +14,7 @@ NODES_NUM = 50
 BEAM_SIZE = -1
 
 # Local Search Settings
-USE_LOCAL_SEARCH = False
+USE_LOCAL_SEARCH = True
 
 # Test File & Pretrained Settings
 TEST_FILE_DICT = {

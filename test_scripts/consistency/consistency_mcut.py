@@ -16,11 +16,11 @@ SAMPLING_NUM = 1 # S
 BEAM_SIZE = -1 # Beam Search
 
 # Local Search Settings
-USE_RLSA = True
+USE_RLSA = False
 RLSA_SETTINGS_DICT = {
-    "BA-SMALL": (0.01, 20, 1000, 1000, 1.02),
-    "BA-LARGE": (1, 100, 1000, 1000, 1.02),
-    "BA-GIANT": (1, 200, 1000, 1000, 1.02)
+    "BA-SMALL": (1, 20, 1000, 1000, 0.3),
+    "BA-LARGE": (1, 50, 1000, 1000, 0.3),
+    "BA-GIANT": (1, 100, 1000, 1000, 0.3)
 }
 
 # Test File & Pretrained Settings

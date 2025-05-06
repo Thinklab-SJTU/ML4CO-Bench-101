@@ -10,7 +10,7 @@ from ml4co.symnco import *
 NODES_NUM = 100
 
 # Solving Settings
-DECODE_TYPE = "greedy" # "multistart_greedy"
+DECODE_TYPE = "greedy" # "sampling" / "multistart_greedy" / "multistart_sampling"
 
 # Local Search Settings
 USE_LOCAL_SEARCH = True

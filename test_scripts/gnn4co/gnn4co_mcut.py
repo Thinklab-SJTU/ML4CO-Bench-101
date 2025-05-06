@@ -10,13 +10,13 @@ from ml4co.gnn4co import *
 TEST_TYPE = "BA-SMALL"
 
 # Solving Settings
-SOLVING_SETTINGS = ("greedy", "rlsa")
+SOLVING_SETTINGS = ("greedy", None) # ("greedy", "rlsa")
 
 # Local Search Settings
 RLSA_SETTINGS_DICT = {
-    "BA-SMALL": (0.01, 20, 1000, 1000),
-    "BA-LARGE": (1, 100, 1000, 1000),
-    "BA-GIANT": (1, 200, 1000, 1000)
+    "BA-SMALL": (1, 20, 1000, 1000),
+    "BA-LARGE": (1, 50, 1000, 1000),
+    "BA-GIANT": (1, 100, 1000, 1000)
 }
 
 # Test File & Pretrained Settings

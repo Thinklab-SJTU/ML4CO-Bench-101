@@ -8,7 +8,7 @@ from ml4co.co_expander import *
 
 # Problem Settings
 NODES_NUM = 50
-SPARSE_FACTOR = -1
+SPARSE_FACTOR = -1 # 50 for TSP-500 and TSP-10K, 100 for TSP-1K
 
 # COExpander Settings
 INFERENCE_STEP = 5 # Is

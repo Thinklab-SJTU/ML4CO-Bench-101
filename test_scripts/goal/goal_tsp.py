@@ -8,7 +8,7 @@ from ml4co.goal import *
 
 # Problem Settings
 NODES_NUM = 50
-KNNS = -1
+KNNS = -1 # 50 for TSP-500 and TSP-10K, 100 for TSP-1K
 
 # Solving Settings
 BEAM_SIZE = -1

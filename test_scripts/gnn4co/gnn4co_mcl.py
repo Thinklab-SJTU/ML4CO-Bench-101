@@ -10,7 +10,7 @@ from ml4co.gnn4co import *
 TEST_TYPE = "RB-GIANT"
 
 # Solving Settings
-SOLVING_SETTINGS = ("beam", None)
+SOLVING_SETTINGS = ("greedy", None) # ("greedy", "rlsa") / ("beam", None) / ("beam", "rlsa")
 
 # Local Search Settings
 RLSA_SETTINGS_DICT = {

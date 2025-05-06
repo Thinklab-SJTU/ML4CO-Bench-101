@@ -10,16 +10,16 @@ from ml4co.gnn4co import *
 TEST_TYPE = "RB-SMALL"
 
 # Solving Settings
-SOLVING_SETTINGS = ("greedy", None)
+SOLVING_SETTINGS = ("greedy", None) # ("greedy", "rlsa") / ("beam", None) / ("beam", "rlsa")
 
 # Local Search Settings
 RLSA_SETTINGS_DICT = {
     "RB-SMALL": (0.01, 5, 1000, 500, 1.02, 0.3),
-    "RB-LARGE": (0.01, 5, 1000, 1000, 1.02, 0.15),
-    "RB-GIANT": (0.01, 5, 1000, 1000, 1.02, 0.1),
-    "ER-700-800": (0.2, 10, 1000, 1000, 1.001, 0.2),
-    "ER-1400-1600": (0.2, 10, 1000, 1000, 1.001, 0.1),
-    "SATLIB": (0.2, 5, 1000, 1000, 1.02, 0.3),
+    "RB-LARGE": (0.01, 5, 1000, 1000, 1.02, 0.3),
+    "RB-GIANT": (0.01, 5, 1000, 1000, 1.02, 0.3),
+    "ER-700-800": (0.2, 10, 1000, 1000, 1.001, 0.3),
+    "ER-1400-1600": (0.2, 10, 1000, 1000, 1.001, 0.3),
+    "SATLIB": (0.01, 2, 1000, 1000, 1.02, 0.3),
 }
 
 # Test File & Pretrained Settings
