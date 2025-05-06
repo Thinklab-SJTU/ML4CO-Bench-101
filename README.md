@@ -1,17 +1,17 @@
-# ML4CO-101 [Under Review]
+# ML4CO-Bench-101 [Under Review]
 
 ## 📚 Brief Introductions
 
-**Official implementation of paper (submitted to NeurIPS-2025 Datasets & Benchmarks):** [ML4CO-101: Benchmarking Machine Learning for
-Classic Routing and Graph Theory Problems](TODO).
+**Official implementation of paper (submitted to NeurIPS-2025 Datasets & Benchmarks):** [ML4CO-Bench-101: Benchmark Machine Learning
+for Classic Combinatorial Problems on Graphs](TODO).
 
-**Abstract:** Success of deep neural networks have drawn forth the progressive community of machine learning for combinatorial optimization (ML4CO), in pursuit of efficiency advantage with increasingly narrowed optimality gaps. Abundant works as ML4CO has fostered, there lacks comprehensive categorization, unified reproducibility, as well as transparent evaluation and comparing protocol for the immense pool of neural CO solvers. To this end, we establish a modular and streamlined framework benchmarking prevalent neural CO methods, dissecting their design choices via a tri-leveled ``paradigm-model-learning'' taxonomy to better characterize different approaches. Further, we integrate their shared features and respective strengths to form 3 unified solvers representing global prediction (GP), local construction (LC), and adaptive expansion (AE) mannered neural solvers. We also collate a total of 34 datasets for 7 mainstream CO problems (TSP, ATSP, CVRP, MIS, MCut, MVC, MCut) across scales to facilitate more comparable results among literature. Extensive experiments upon our benchmark reveal a fair and exact performance exhibition indicative of the raw contribution of the learning components in each method, rethinking and insisting that pre- and post-inference heuristic tricks are not supposed to compensate for sub-par capability of the data-driven counterparts. Under this unified benchmark, an up-to-date replication of typical ML4CO methods is maintained, hoping to provide convenient reference and insightful guidelines for both engineering development and academic exploration of the ML4CO community in the future. 
+**Abstract:** Combinatorial problems on graphs have attracted extensive efforts from the machine learning community over the past decade. Despite the notable development in this area under the umbrella ML4CO, there lacks comprehensive categorization, unified reproducibility, as well as transparent evaluation protocol for the emerginging and immense pool of neural CO solvers. In this paper, we establish a modular and streamlined framework benchmarking prevalent neural CO methods, dissecting their design choices via a tri-leveled ``paradigm-model-learning'' taxonomy to better characterize different approaches. Further, we integrate their shared features and respective strengths to form 3 unified solvers representing global prediction (GP), local construction (LC), and adaptive expansion (AE) mannered neural solvers. We also collate a total of 34 datasets for 7 mainstream CO problems (including both edge-oriented tasks: TSP, ATSP, CVRP, as well as edge-oriented: MIS, MCut, MVC, MCut) across scales to facilitate more comparable results among literature. Extensive experiments upon our benchmark reveal a fair and exact performance exhibition indicative of the raw contribution of the learning components in each method, rethinking and insisting that pre- and post-inference heuristic tricks are not supposed to compensate for sub-par capability of the data-driven counterparts. Under this unified benchmark, an up-to-date replication of typical ML4CO methods is maintained, hoping to provide convenient reference and insightful guidelines for both engineering development and academic exploration of the ML4CO community in the future.
 
 <img src="assets/ml4co.png" alt="Organization" width="800"/>
 
 ## 📦 Setup
 
-Please follow the steps below to set up the experimental environment for ML4CO-101
+Please follow the steps below to set up the experimental environment for ML4CO-Bench-101
 
 > **Step1: check the OS and the ``cuda`` driver**
 
@@ -38,7 +38,7 @@ pip install --no-index torch-cluster -f https://pytorch-geometric.com/whl/torch-
 
 > **Step3: install ``pytorch-lightning``, ``tensordict``, ``WandB``, etc.**
 
-The overall training framework of ``ML4CO-101`` is based on [``pytorch-lightning``](https://github.com/Lightning-AI/pytorch-lightning), [``tensordict``](https://github.com/pytorch/tensordict) and [``wandb``](https://github.com/wandb/wandb). Please install the corresponding packages.
+The overall training framework of ``ML4CO-Bench-101`` is based on [``pytorch-lightning``](https://github.com/Lightning-AI/pytorch-lightning), [``tensordict``](https://github.com/pytorch/tensordict) and [``wandb``](https://github.com/wandb/wandb). Please install the corresponding packages.
 
 ```bash
 pip install wandb==0.16.3 # >=0.16.3
@@ -49,10 +49,10 @@ pip install einops==0.8.0 # >=0.8.0
 
 > **Step4: install ``ML4CO-Kit``**
 
-We have developed the open-source toolkit [``ML4CO-Kit``](https://github.com/Thinklab-SJTU/ML4CO-Kit), which aims to provide: decoding or post-processing algorithms, traditional solvers, evaluators, data generators, visualization tools, and read-and-write functions for various types of data. ``ML4CO-101`` is based on this open-source toolkit, and the traditional solvers mentioned in ``Appendix D`` can be quickly invoked through this package. 
+We have developed the open-source toolkit [``ML4CO-Kit``](https://github.com/Thinklab-SJTU/ML4CO-Kit), which aims to provide: decoding or post-processing algorithms, traditional solvers, evaluators, data generators, visualization tools, and read-and-write functions for various types of data. ``ML4CO-Bench-101`` is based on this open-source toolkit, and the traditional solvers mentioned in ``Appendix D`` can be quickly invoked through this package. 
 
 ```bash
-pip install ml4co-kit==0.3.2 # stable version (python=3.8~3.11)
+pip install ml4co-kit==0.3.3 # stable version (python=3.8~3.11)
 ```
 
 **Note:** Due to specific dependencies of some repositories, we recommend you to use the version ``python-3.8``, ``pytorch-1.7.0`` and ``cuda-11.0`` for ``DIMES``. Then locally install ``torch_sampling`` and compile ``dense_greedy``:
@@ -77,7 +77,7 @@ We use ``google drive`` to store our test-datasets and pre-trained files.
 
 > **Step2: train-datasets**
 
-We use ``hugging-face`` to store our train-datasets. Please download them [here](https://huggingface.co/datasets/ML4CO/ML4CO-101-SL/tree/main/train_dataset).
+We use ``hugging-face`` to store our train-datasets. Please download them [here](https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/main/train_dataset).
 
 ## 📝 Algorithm Design Correspondence Table
 
@@ -111,7 +111,7 @@ First, please download the test-datasets and pre-trained files you need to your 
 
 ## ✨ Citation
 
-If you find ML4CO-101 valuable for your research or applied projects:
+If you find ML4CO-Bench-101 valuable for your research or applied projects:
 ```bibtex
 TODO
 ```
