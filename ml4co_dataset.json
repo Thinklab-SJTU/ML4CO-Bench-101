@@ -51,7 +51,7 @@
             "@id":"repo",
             "name":"repo",
             "description":"The Hugging Face git repository.",
-            "contentUrl":"https://huggingface.co/datasets/ML4CO/ML4CO-101-SL/tree/refs%2Fconvert%2Fparquet",
+            "contentUrl":"https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/refs%2Fconvert%2Fparquet",
             "encodingFormat":"git+https",
             "sha256":"https://github.com/mlcommons/croissant/issues/80"
         },
@@ -94,7 +94,7 @@
         {
             "@type":"cr:RecordSet",
             "@id":"default",
-            "description":"ML4CO/ML4CO-101-SL - 'default' subset (first 5GB)\n\nAdditional information:\n- 2 splits: train, test",
+            "description":"ML4CO/ML4CO-Bench-101-SL - 'default' subset (first 5GB)\n\nAdditional information:\n- 2 splits: train, test",
             "field":[
                 {
                     "@type":"cr:Field",
@@ -134,9 +134,9 @@
         }
     ],
     "conformsTo":"http://mlcommons.org/croissant/1.1",
-    "name":"ML4CO-101-SL",
-    "description":"ML4CO/ML4CO-101-SL dataset hosted on Hugging Face and contributed by the HF Datasets community",
-    "alternateName":["ML4CO/ML4CO-101-SL"],
+    "name":"ML4CO-Bench-101-SL",
+    "description":"ML4CO/ML4CO-Bench-101-SL dataset hosted on Hugging Face and contributed by the HF Datasets community",
+    "alternateName":["ML4CO/ML4CO-Bench-101-SL"],
     "creator":{
         "@type":"Organization",
         "name":"ML4CO",
@@ -152,5 +152,5 @@
         "🇺🇸 Region: US"
     ],
     "license":"https://choosealicense.com/licenses/cc-by-4.0/",
-    "url":"https://huggingface.co/datasets/ML4CO/ML4CO-101-SL"
+    "url":"https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL"
 }

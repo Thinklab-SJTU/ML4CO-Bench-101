@@ -7,7 +7,7 @@ sys.path.append(sub_folder)
 from ml4co.gnn4co import *
 
 # Problem Settings
-TEST_TYPE = "RB-GIANT"
+TEST_TYPE = "RB-SMALL"
 
 # Solving Settings
 SOLVING_SETTINGS = ("greedy", None) # ("greedy", "rlsa") / ("beam", None) / ("beam", "rlsa")
