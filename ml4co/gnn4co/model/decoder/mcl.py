@@ -10,14 +10,11 @@ from gnn4co.model.decoder.base import GNN4CODecoder
 class MClDecoder(GNN4CODecoder):
     def __init__(
         self,
-        # basic
         decoding_type: str = "greedy", 
         local_search_type: str = None,
-        # beam
         beam_size = 16,
-        # rlsa
         rlsa_tau: float = 0.01,
-        rlsa_d: int = 2,        
+        rlsa_d: int = 5,        
         rlsa_k: int = 1000,
         rlsa_t: int = 1000,
         rlsa_beta: float = 1.02,
@@ -68,6 +65,7 @@ class MClDecoder(GNN4CODecoder):
             sol = mcl_rlsa_local_search(
                 init_sol=sol,
                 graph=np_graph,
+                rlsa_kth_dim="both",
                 rlsa_tau=self.rlsa_tau,
                 rlsa_d=self.rlsa_d,
                 rlsa_k=self.rlsa_k,

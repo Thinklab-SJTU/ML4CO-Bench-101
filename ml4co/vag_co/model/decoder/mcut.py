@@ -7,14 +7,12 @@ from vag_co.model.decoder.base import VAGCODecoder
 class MCutDecoder(VAGCODecoder):
     def __init__(
         self, 
-        # basic
         decoding_type: str = "greedy", 
         local_search_type: str = None,
-        # rlsa
-        rlsa_tau: float = 1.5,
-        rlsa_d: int = 20,        
-        rlsa_k: int = 200,
-        rlsa_t: int = 500,
+        rlsa_tau: float = 0.01,
+        rlsa_d: int = 5,        
+        rlsa_k: int = 1000,
+        rlsa_t: int = 1000,
         rlsa_device: str = "cuda",
         rlsa_seed: int = 1234
     ) -> None:
@@ -51,6 +49,7 @@ class MCutDecoder(VAGCODecoder):
                 init_sol=sol,
                 graph=to_numpy(graph),
                 edge_index=to_numpy(edge_index),
+                rlsa_kth_dim="both",
                 rlsa_tau=self.rlsa_tau,
                 rlsa_d=self.rlsa_d,
                 rlsa_k=self.rlsa_k,

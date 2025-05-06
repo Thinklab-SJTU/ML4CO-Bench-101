@@ -11,7 +11,7 @@ def mis_decode_greedy(
     edge_index: np.ndarray, 
     use_rlsa: bool = True, 
     rlsa_tau: float = 0.01, 
-    rlsa_d: int = 2, 
+    rlsa_d: int = 5, 
     rlsa_k: int = 1000, 
     rlsa_t: int = 1000, 
     rlsa_beta: float = 1.02, 
@@ -35,6 +35,7 @@ def mis_decode_greedy(
         sol = mis_rlsa_local_search(
             init_sol=sol,
             graph=adj_matrix,
+            rlsa_kth_dim="both",
             rlsa_tau=rlsa_tau,
             rlsa_d=rlsa_d,
             rlsa_k=rlsa_k,

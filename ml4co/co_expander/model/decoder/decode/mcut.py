@@ -47,6 +47,7 @@ def mcut_sparse_decode(
                         init_sol=vars[node_begin_idx:node_end_idx],
                         graph=to_numpy(graph),
                         edge_index=edge_index[edge_begin_idx:edge_end_idx],
+                        rlsa_kth_dim="both",
                         rlsa_tau=rlsa_tau,
                         rlsa_d=rlsa_d,
                         rlsa_k=rlsa_k,

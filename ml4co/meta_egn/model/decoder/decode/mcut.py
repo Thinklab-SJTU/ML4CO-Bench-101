@@ -11,11 +11,9 @@ def mcut_decode_greedy(
     edge_index: np.ndarray, 
     use_rlsa: bool = True, 
     rlsa_tau: float = 0.01, 
-    rlsa_d: int = 2, 
+    rlsa_d: int = 5, 
     rlsa_k: int = 1000, 
     rlsa_t: int = 1000, 
-    rlsa_beta: float = 1.02, 
-    rlsa_alpha: float = 0.3, 
     rlsa_device: str = "cuda",
     rlsa_seed: int = 1234
 ):
@@ -36,12 +34,11 @@ def mcut_decode_greedy(
             init_sol=sol,
             graph=adj_matrix,
             edge_index=edge_index,
+            rlsa_kth_dim="both",
             rlsa_tau=rlsa_tau,
             rlsa_d=rlsa_d,
             rlsa_k=rlsa_k,
             rlsa_t=rlsa_t,
-            rlsa_alpha=rlsa_alpha,
-            rlsa_beta=rlsa_beta,
             rlsa_device=rlsa_device,
             seed=rlsa_seed
         )

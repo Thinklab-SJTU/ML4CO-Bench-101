@@ -40,6 +40,7 @@ def mvc_sparse_decode(
                     mvc_rlsa_local_search(
                         init_sol=vars[begin_idx:end_idx],
                         graph=to_numpy(graph),
+                        rlsa_kth_dim="both",
                         rlsa_tau=rlsa_tau,
                         rlsa_d=rlsa_d,
                         rlsa_k=rlsa_k,

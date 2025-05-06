@@ -9,16 +9,12 @@ from vag_co.model.decoder.base import VAGCODecoder
 class MVCDecoder(VAGCODecoder):
     def __init__(
         self,
-        # basic
         decoding_type: str = "greedy", 
         local_search_type: str = None,
-        # beam
-        beam_size = 16,
-        # rlsa
         rlsa_tau: float = 0.01,
-        rlsa_d: int = 2,        
-        rlsa_k: int = 200,
-        rlsa_t: int = 500,
+        rlsa_d: int = 5,        
+        rlsa_k: int = 1000,
+        rlsa_t: int = 100,
         rlsa_beta: float = 1.02,
         rlsa_alpha: float = 0.3,
         rlsa_device: str = "cuda",
@@ -30,9 +26,6 @@ class MVCDecoder(VAGCODecoder):
         self.decoding_type = decoding_type
         self.local_search_type = local_search_type
 
-        # beam
-        self.beam_size = beam_size
-        
         # rlsa
         self.rlsa_tau = rlsa_tau
         self.rlsa_d = rlsa_d
@@ -61,6 +54,7 @@ class MVCDecoder(VAGCODecoder):
             sol = mvc_rlsa_local_search(
                 init_sol=sol,
                 graph=np_graph,
+                rlsa_kth_dim="both",
                 rlsa_tau=self.rlsa_tau,
                 rlsa_d=self.rlsa_d,
                 rlsa_k=self.rlsa_k,
