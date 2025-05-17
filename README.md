@@ -2,9 +2,6 @@
 
 ## 📚 Brief Introductions
 
-**Official implementation of paper (submitted to NeurIPS-2025 Datasets & Benchmarks):** [ML4CO-Bench-101: Benchmark Machine Learning
-for Classic Combinatorial Problems on Graphs](https://www.researchgate.net/publication/391832922).
-
 **Abstract:** Combinatorial problems on graphs have attracted extensive efforts from the machine learning community over the past decade. Despite notable progress in this area under the umbrella of ML4CO, a comprehensive categorization, unified reproducibility, and transparent evaluation protocols are still lacking for the emerging and immense pool of neural CO solvers. In this paper, we establish a modular and streamlined framework benchmarking prevalent neural CO methods, dissecting their design choices via a tri-leveled ``paradigm-model-learning'' taxonomy to better characterize different approaches. Further, we integrate their shared features and respective strengths to form 3 unified solvers representing global prediction (GP), local construction (LC), and adaptive expansion (AE) mannered neural solvers. We also collate a total of 34 datasets for 7 mainstream CO problems (including both edge-oriented tasks: TSP, ATSP, CVRP, as well as edge-oriented: MIS, MCut, MVC, MCut) across scales to facilitate more comparable results among literature. Extensive experiments upon our benchmark reveal a fair and exact performance exhibition indicative of the raw contribution of the learning components in each method, rethinking and insisting that pre- and post-inference heuristic tricks are not supposed to compensate for sub-par capability of the data-driven counterparts. Under this unified benchmark, an up-to-date replication of typical ML4CO methods is maintained, hoping to provide convenient reference and insightful guidelines for both engineering development and academic exploration of the ML4CO community in the future.
 
 <img src="assets/ml4co.png" alt="Organization" width="800"/>
@@ -133,12 +130,6 @@ First, please download the test-datasets and pre-trained files you need to your 
 
 ## ✨ Citation
 
-If you find ML4CO-Bench-101 valuable for your research or applied projects:
-```bibtex
-@article{ma2025ml4co,
-    title={{ML4CO-Bench-101: Benchmark Machine Learning for Classic Combinatorial Problems on Graphs}},
-    author={Jiale Ma and Wenzheng Pan and Yang Li and Junchi Yan},
-    year={2025},
-    howpublished ={\url{https://www.researchgate.net/publication/391832922}},
-}
-```
+If you find ML4CO-Bench-101 valuable for your research or applied projects, please cite:
+
+ ``https://github.com/Thinklab-SJTU/ML4CO-Bench-101``
