@@ -118,7 +118,7 @@ We find that the ML4CO method outperform traditional solvers on some benchmark d
 | ``symnco``      | ``LC4CO`` | ``LC-OS-RL``   | ✔ | -- | ✔ | -- | -- | -- | -- |
 | ``co_expander`` | ``AE4CO`` | ``AE-Gen-SL``  | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 
-## 🚀 Gettiing Started
+## 🚀 Getting Started
 
 > **Step1: how to train a model**
 
