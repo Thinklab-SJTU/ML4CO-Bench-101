@@ -1,4 +1,4 @@
-# ML4CO-Bench-101 [Under Review]
+# ML4CO-Bench-101
 
 ## 📚 Brief Introductions
 
