@@ -134,3 +134,43 @@ First, please download the test-datasets and pre-trained files you need to your 
 If you find ML4CO-Bench-101 valuable for your research or applied projects, please cite:
 
  ``https://github.com/Thinklab-SJTU/ML4CO-Bench-101``
+
+
+## 🙏 Acknowledgements
+
+Our benchmark work is based on the organization and summarization of the existing methods in ML4CO. We would like to express our special gratitude to the following works.
+
+> Fast T2T: Optimization Consistency Speeds Up Diffusion-Based Training-to-Testing Solving for Combinatorial Optimization ([NeurIPS-2024 Paper](https://proceedings.neurips.cc/paper_files/paper/2024/file/352b13f01566ae34affacc60e98c16af-Paper-Conference.pdf))
+
+* Contribute: ``GP-Gen-SL`` and ``consisteny``
+* Code: https://github.com/Thinklab-SJTU/Fast-T2T
+
+> Unsupervised Learning for Solving the Travelling Salesman Problem ([NeurIPS-2023 Paper](https://proceedings.neurips.cc/paper_files/paper/2023/file/93b8618a9061f8a55825c13ecf28392b-Paper-Conference.pdf))
+
+* Contribute: ``GP-OS-UL`` and ``utsp``
+* Code: https://github.com/yimengmin/UTSP
+
+> Unsupervised Learning for Combinatorial Optimization Needs Meta-Learning ([ICLR-2023 Paper](https://arxiv.org/pdf/2301.03116))
+
+* Contribute: ``GP-OS-MAML`` and ``meta_egn``
+* Code: https://github.com/Graph-COM/Meta_CO
+
+> DIMES: A Differentiable Meta Solver for Combinatorial Optimization Problems ([NeurIPS-2022 Papers](https://proceedings.neurips.cc/paper_files/paper/2022/file/a3a7387e49f4de290c23beea2dfcdc75-Paper-Conference.pdf))
+
+* Contribute: ``GP-OS-MAML`` and ``dimes``
+* Code: https://github.com/DIMESTeam/DIMES
+
+> GOAL: A Generalist Combinatorial Optimization Agent Learner ([ICLR-2025 Paper](https://openreview.net/pdf?id=z2z9suDRjw))
+
+* Contribute: ``LC-OS-SL`` and ``goal``
+* Code: https://github.com/naver/goal-co
+
+> RL4CO: an Extensive Reinforcement Learning for Combinatorial Optimization Benchmark ([Arxiv Preprint](https://arxiv.org/pdf/2306.17100))
+
+* Contribute: ``LC-OS-RL`` and ``symnco``
+* Code: https://github.com/ai4co/rl4co
+
+> Matrix encoding networks for neural combinatorial optimization ([NeurIPS-2021 Paper](https://proceedings.neurips.cc/paper_files/paper/2021/file/29539ed932d32f1c56324cded92c07c2-Paper.pdf))
+
+* Contribute: ``LC-OS-RL`` and ``matnet``
+* Code: https://github.com/yd-kwon/MatNet
