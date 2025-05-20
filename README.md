@@ -157,7 +157,7 @@ Our benchmark work is based on the organization and summarization of the existin
 * Contribute: ``GP-OS-MAML`` and ``meta_egn``
 * Code: https://github.com/Graph-COM/Meta_CO
 
-> DIMES: A Differentiable Meta Solver for Combinatorial Optimization Problems ([NeurIPS-2022 Papers](https://proceedings.neurips.cc/paper_files/paper/2022/file/a3a7387e49f4de290c23beea2dfcdc75-Paper-Conference.pdf))
+> DIMES: A Differentiable Meta Solver for Combinatorial Optimization Problems ([NeurIPS-2022 Paper](https://proceedings.neurips.cc/paper_files/paper/2022/file/a3a7387e49f4de290c23beea2dfcdc75-Paper-Conference.pdf))
 
 * Contribute: ``GP-OS-MAML`` and ``dimes``
 * Code: https://github.com/DIMESTeam/DIMES
