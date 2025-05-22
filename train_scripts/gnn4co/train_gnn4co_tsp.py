@@ -2,6 +2,8 @@ import os
 import sys
 root_folder = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(root_folder)
+sub_folder = os.path.join(root_folder, "ml4co")
+sys.path.append(sub_folder)
 from ml4co_kit import Trainer
 from ml4co.gnn4co import GNN4COModel, GNN4COEnv, TSPGNNEncoder, TSPDecoder
 
