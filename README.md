@@ -1,4 +1,4 @@
-# ML4CO-Bench-101
+# ML4CO-Bench-101 (NeurIPS-2025)
 
 ## 📚 Brief Introductions
 
@@ -96,6 +96,7 @@ We use ``google-drive`` and ``hugging-face`` to store datasets.
 We find that the ML4CO method outperform traditional solvers on some benchmark datasets. Besides, most neural methods achieved an advantage in speed. For the better future development of the community, we have for the first time released the ML4CO solution result dataset for the all benchmark datasets. The results are shown in the table below, and you can download the dataset from [hugging-face](https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/main/ml4co_result) or [google-drive](https://drive.google.com/drive/folders/1RfA6hr0896uihnOVtA6CsN0XjqRUMBA-?usp=sharing).
 
 <img src="assets/performance.png" alt="Organization" width="800"/>
+<img src="assets/performance_cross.png" alt="Organization" width="800"/>
 
 
 ## 📝 Algorithm Design Correspondence Table
@@ -132,7 +133,16 @@ First, please download the test-datasets and pre-trained files you need to your 
 
 If you find ML4CO-Bench-101 valuable for your research or applied projects, please cite:
 
- ``https://github.com/Thinklab-SJTU/ML4CO-Bench-101``
+```bibtex
+@inproceedings{
+    ma2025mlcobench,
+    title={ML4CO-Bench-101: Benchmark Machine Learning for Classic Combinatorial Problems on Graphs},
+    author={Jiale Ma and Wenzheng Pan and Yang Li and Junchi Yan},
+    booktitle={The Thirty-ninth Annual Conference on Neural Information Processing Systems Datasets and Benchmarks Track},
+    year={2025},
+    url={https://openreview.net/forum?id=ye4ntB1Kzi}
+}
+```
 
 
 ## 🙏 Acknowledgements
