@@ -2,8 +2,7 @@
 
 ## 📚 Brief Introductions
 
-**Abstract:** Combinatorial problems on graphs have attracted extensive efforts from the machine learning community over the past decade. Despite notable progress in this area under the umbrella of ML4CO, a comprehensive categorization, unified reproducibility, and transparent evaluation protocols are still lacking for the emerging and immense pool of neural CO solvers. In this paper, we establish a modular and streamlined framework benchmarking prevalent neural CO methods, dissecting their design choices via a tri-leveled 
-"paradigm-model-learning" taxonomy to better characterize different approaches. Further, we integrate their shared features and respective strengths to form 3 unified solvers representing global prediction (GP), local construction (LC), and adaptive expansion (AE) mannered neural solvers. We also collate a total of 34 datasets for 7 mainstream CO problems (including both edge-oriented tasks: TSP, ATSP, CVRP, as well as edge-oriented: MIS, MCut, MVC, MCut) across scales to facilitate more comparable results among literature. Extensive experiments upon our benchmark reveal a fair and exact performance exhibition indicative of the raw contribution of the learning components in each method, rethinking and insisting that pre- and post-inference heuristic tricks are not supposed to compensate for sub-par capability of the data-driven counterparts. Under this unified benchmark, an up-to-date replication of typical ML4CO methods is maintained, hoping to provide convenient reference and insightful guidelines for both engineering development and academic exploration of the ML4CO community in the future.
+**Abstract:** Combinatorial problems on graphs have attracted extensive efforts from the machine learning community over the past decade. Despite notable progress in this area under the umbrella of ML4CO, a comprehensive categorization, unified reproducibility, and transparent evaluation protocols are still lacking for the emerging and immense pool of neural CO solvers. In this paper, we establish a modular and streamlined framework benchmarking prevalent neural CO methods, dissecting their design choices via a tri-leveled "paradigm-model-learning" taxonomy to better characterize different approaches. Further, we integrate their shared features and respective strengths to form 3 unified solvers representing global prediction (GP), local construction (LC), and adaptive expansion (AE) mannered neural solvers. We also collate a total of 34 datasets for 7 mainstream CO problems (including both edge-oriented tasks: TSP, ATSP, CVRP, as well as node-oriented: MIS, MCl, MVC, MCut) across scales to facilitate more comparable results among literature. Extensive experiments upon our benchmark reveal a fair and exact performance exhibition indicative of the raw contribution of the learning components in each method, rethinking and insisting that pre- and post-inference heuristic tricks are not supposed to compensate for sub-par capability of the data-driven counterparts. Under this unified benchmark, an up-to-date replication of typical ML4CO methods is maintained, hoping to provide convenient reference and insightful guidelines for both engineering development and academic exploration of the ML4CO community in the future.
 
 <img src="assets/ml4co.png" alt="Organization" width="800"/>
 
@@ -82,21 +81,19 @@ gcc ./dimes_greedy_dense.c -o dense_greedy.so -fPIC -shared
 
 ## ⚡ Datasets and Pretrained Files
 
-> **Step1: test-datasets and pretrained weights**
+> **Train / Test / Cross datasets and pretrained weights**
 
-We use ``google drive`` to store our test-datasets and pre-trained files. 
+We use ``google-drive`` and ``hugging-face`` to store datasets.
 
-* Please download test-datasets [here](https://drive.google.com/drive/folders/1d7pMissm8r6C0lNP0380zu3o505HN4PC?usp=drive_link) or [here](https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/main/test_dataset).
-* Please download pre-trained files [here](https://drive.google.com/drive/folders/1DWWE-pVGgNJTNiXj2PADMT5q7SKbx0Hd?usp=drive_link).
-
-> **Step2: train-datasets**
-
-We use ``hugging-face`` to store our train-datasets. Please download them [here](https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/main/train_dataset).
+* Please download ``train_dataset`` from [hugging-face](https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/main/train_dataset).
+* Please download ``test_dataset`` from [hugging-face](https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/main/test_dataset) or [google-drive](https://drive.google.com/drive/folders/1d7pMissm8r6C0lNP0380zu3o505HN4PC?usp=sharing).
+* Please download ``cross_dataset`` from [hugging-face](https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/main/cross_dataset).
+* Please download ``weights`` from [hugging-face](https://huggingface.co/ML4CO/ML4CO-Bench-101/tree/main) or [google-drive](https://drive.google.com/drive/folders/1DWWE-pVGgNJTNiXj2PADMT5q7SKbx0Hd?usp=sharing).
 
 
 > **ML4CO-Bench-101 Results**
 
-We find that the ML4CO method outperform traditional solvers on some benchmark datasets. Besides, most neural methods achieved an advantage in speed. For the better future development of the community, we have for the first time released the ML4CO solution result dataset for the all benchmark datasets. The results are shown in the table below, and you can download the dataset [here](https://drive.google.com/drive/folders/1RfA6hr0896uihnOVtA6CsN0XjqRUMBA-?usp=sharing) or [here](https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/main/ml4co_result).
+We find that the ML4CO method outperform traditional solvers on some benchmark datasets. Besides, most neural methods achieved an advantage in speed. For the better future development of the community, we have for the first time released the ML4CO solution result dataset for the all benchmark datasets. The results are shown in the table below, and you can download the dataset from [hugging-face](https://huggingface.co/datasets/ML4CO/ML4CO-Bench-101-SL/tree/main/ml4co_result) or [google-drive](https://drive.google.com/drive/folders/1RfA6hr0896uihnOVtA6CsN0XjqRUMBA-?usp=sharing).
 
 <img src="assets/performance.png" alt="Organization" width="800"/>
 

@@ -14,6 +14,7 @@ INFERENCE_STEP = 1 # Is
 DETERMINATE_STEP = 20 # Ds
 SAMPLING_NUM = 1 # S
 BEAM_SIZE = -1 # Beam Search
+FINETUNE = True
 
 # Local Search Settings
 USE_RLSA = False
@@ -30,9 +31,16 @@ TEST_FILE_DICT = {
     "BA-GIANT": "test_dataset/mcut/mcut_ba-giant_gurobi-3600s_7217.900.txt"
 }
 WEIGHT_PATH_DICT = {
-    "BA-SMALL": "weights/co_expander/coexpander_mcut_ba-small_sparse.pt",
-    "BA-LARGE": "weights/co_expander/coexpander_mcut_ba-large_sparse.pt",
-    "BA-GIANT": "weights/co_expander/coexpander_mcut_ba-large_sparse.pt"
+    True: {
+        "BA-SMALL": "weights/co_expander/coexpander_mcut_ba-small_sparse_finetune.pt",
+        "BA-LARGE": "weights/co_expander/coexpander_mcut_ba-large_sparse_finetune.pt",
+        "BA-GIANT": "weights/co_expander/coexpander_mcut_ba-large_sparse_finetune.pt"
+    },
+    False: {
+        "BA-SMALL": "weights/co_expander/coexpander_mcut_ba-small_sparse.pt",
+        "BA-LARGE": "weights/co_expander/coexpander_mcut_ba-large_sparse.pt",
+        "BA-GIANT": "weights/co_expander/coexpander_mcut_ba-large_sparse.pt"
+    }
 }
 
 # main
@@ -58,7 +66,7 @@ if __name__ == "__main__":
                     "rlsa_t": rlsa_settings[3]
                 }
             ),
-            weight_path=WEIGHT_PATH_DICT[TEST_TYPE],
+            weight_path=WEIGHT_PATH_DICT[FINETUNE][TEST_TYPE],
             inference_steps=INFERENCE_STEP,
             determinate_steps=DETERMINATE_STEP,
             beam_size=BEAM_SIZE,

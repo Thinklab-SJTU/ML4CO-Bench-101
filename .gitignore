@@ -39,6 +39,7 @@ MANIFEST
 dataset/**
 test_dataset/**
 train_dataset/**
+cross_dataset/**
 data/**
 ml4co_result/**
 

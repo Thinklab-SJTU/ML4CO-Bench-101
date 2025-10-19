@@ -50,6 +50,6 @@ if __name__ == "__main__":
             determinate_steps=DETERMINATE_STEP
         )
     )
-    solver.from_txt(TEST_FILE_DICT[NODES_NUM], ref=True)
+    solver.from_txt(TEST_FILE_DICT[NODES_NUM], ref=True, show_time=True)
     solver.solve(sampling_num=SAMPLING_NUM, show_time=True)
     print(solver.evaluate(calculate_gap=True))

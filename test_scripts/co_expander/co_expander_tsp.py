@@ -53,4 +53,3 @@ if __name__ == "__main__":
     solver.from_txt(TEST_FILE_DICT[NODES_NUM], ref=True)
     solver.solve(sampling_num=SAMPLING_NUM, show_time=True)
     print(solver.evaluate(calculate_gap=True))
-    solver.to_txt("tsp1000_ml4co.txt")
