@@ -5,14 +5,14 @@ root_folder = os.path.dirname(
 )
 sys.path.append(root_folder)
 from ml4co_kit import TSPWrapper
-from test_scripts.utils import TSP1K_TEST_PATH
+from test_scripts.test_dataset import TSP1K_TEST_PATH
 from ml4co.fast_t2t import TSPModel, TSPEnv, TSPPLModel, FastT2TSolver
 
 
 # Settings
 DEVICE = "cuda"
 TEST_DATA_PATH = TSP1K_TEST_PATH
-WEIGHT_PATH = f"weights/fast_t2t/tsp1k_fast_t2t.ckpt"
+WEIGHT_PATH = f"weights/fast_t2t/tsp1k_fast_t2t.pt"
 SOLVE_STEPS = 1
 RUNS_NUM = 1
 BATCH_SIZE = 1
