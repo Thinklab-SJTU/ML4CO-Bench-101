@@ -5,6 +5,8 @@ root_folder = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
 sys.path.append(root_folder)
+from ml4co.fast_t2t_ms.skip_ortools import apply as skip_ortools
+skip_ortools()
 from ml4co_kit.learning.extra_backends.mindspore import MSTrainer
 from ml4co.fast_t2t_ms import *
 from train_scripts.val_dataset import TSP1K_VAL_PATH

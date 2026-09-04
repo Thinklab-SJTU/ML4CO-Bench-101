@@ -4,6 +4,8 @@ root_folder = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
 sys.path.append(root_folder)
+from ml4co.fast_t2t_ms.skip_ortools import apply as skip_ortools
+skip_ortools()
 from ml4co_kit import TSPWrapper
 from test_scripts.test_dataset import TSP1K_TEST_PATH
 from ml4co.fast_t2t_ms import TSPModel, TSPEnv, TSPPLModel, FastT2TMSSolver
