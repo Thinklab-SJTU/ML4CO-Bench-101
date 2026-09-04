@@ -7,8 +7,8 @@ from ml4co_kit import TSPTask, to_numpy, to_tensor
 from ml4co.fast_t2t.tsp.tsp_env import TSPEnv
 from ml4co.fast_t2t.tsp.module import TSPModel
 from ml4co.fast_t2t.tsp.tsp_diffusion import TSPDiffusion
-from ml4co.fast_t2t.tsp.lib import c_tsp_greedy, c_tsp_2opt, pytorch_tsp_gpu_2opt
 from ml4co.fast_t2t.common import MetaPLModel, MetaDataBatch, InferenceSchedule
+from ml4co.fast_t2t.tsp.lib import c_tsp_greedy, c_tsp_2opt, pytorch_tsp_gpu_2opt
 
 
 class TSPPLModel(MetaPLModel):
