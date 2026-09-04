@@ -1,0 +1,79 @@
+import os
+import sys
+root_folder = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
+sys.path.append(root_folder)
+from ml4co_kit import Trainer
+from ml4co.fast_t2t import *
+from train_scripts.train_dataset import TSP1K_TRAIN_FOLDER
+from train_scripts.val_dataset import TSP1K_VAL_PATH
+
+
+# Dataset Settings
+DATASET_NUM_WORKERS = 2    # number of workers for dataset
+VAL_PATH = TSP1K_VAL_PATH
+TRAIN_FOLDER = TSP1K_TRAIN_FOLDER
+
+
+# Training Settings
+BATCH_SIZE = 4             # batch size
+EPOCH_STEPS = 5000         # number of steps per epoch
+LEARNING_RATE = 1e-4       # learning rate
+WEIGHT_DECAY = 1e-4        # weight decay
+WEIGHT_PATH = None         # weight path
+MAX_EPOCHS = 100           # maximum number of epochs
+DEVICES = [0]              # devices
+
+
+# Main
+if __name__ == "__main__":
+    # Create Train Dataset
+    train_dataset = TSPDataset(
+        num_per_epoch=BATCH_SIZE * EPOCH_STEPS,
+        data_folder=TRAIN_FOLDER,
+    )
+
+    # Create Val Dataset
+    val_dataset = TSPDataset(
+        num_per_epoch=1280,
+        data_path=VAL_PATH,
+    )
+
+    # Create Environment
+    env = TSPEnv(
+        train_dataset=train_dataset,
+        val_dataset=val_dataset,
+        mode="train",
+        train_batch_size=BATCH_SIZE,
+        val_batch_size=BATCH_SIZE,
+        num_workers=DATASET_NUM_WORKERS,
+        device="cuda"
+    )
+    
+    # Create Model
+    model = TSPModel(hidden_dim=256, num_layers=12)
+
+    # Create PL Model
+    pl_model = TSPPLModel(
+        env=env, 
+        model=model, 
+        learning_rate=LEARNING_RATE,
+        weight_decay=WEIGHT_DECAY,
+        weight_path=WEIGHT_PATH,
+    )
+
+    # Create Trainer
+    ckpt_filename = "epoch={epoch}-{val/ag_1:.4f}-{val/ag_5:.4f}-{val/am_1:.4f}-{val/am_5:.4f}"
+    trainer = Trainer(
+        model=pl_model,
+        devices=DEVICES,
+        max_epochs=MAX_EPOCHS,
+        fp16=False,
+        ckpt_filename=ckpt_filename,
+        mode="max",
+        save_top_k=-1
+    )
+
+    # Train
+    trainer.model_train()
