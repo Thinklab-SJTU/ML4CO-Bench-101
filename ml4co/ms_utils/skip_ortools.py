@@ -33,7 +33,7 @@ def apply() -> None:
 
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             raise RuntimeError(
-                "ORSolver is disabled (ml4co.fast_t2t_ms.skip_ortools). "
+                "ORSolver is disabled (ml4co.ms_utils.skip_ortools). "
                 "Install/fix ortools only if you need OR-Tools solvers."
             )
 

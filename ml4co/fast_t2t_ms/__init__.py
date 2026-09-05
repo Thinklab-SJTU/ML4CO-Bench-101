@@ -1,7 +1,8 @@
-# Avoid ml4co_kit pulling in ortools (libre2 / protobuf conflicts on Ascend).
-from .skip_ortools import apply as _skip_ortools
+# Prefer conda libstdc++ before Ascend / system libs (must run first).
+from ml4co.ms_utils import setup_ld_library_path, skip_ortools
 
-_skip_ortools()
+setup_ld_library_path()
+skip_ortools()
 
 from .tsp import *
 from .solver import *
