@@ -127,9 +127,10 @@ def maybe_move_tensor(
     """
     Move ``tensor`` onto ``device`` only when needed.
 
-    Falls back to ``Tensor(asnumpy(), ...)`` after ``ensure_ms_device`` when
-    ``move_to`` fails or leaves storage on the wrong device (common after
-    CPU checkpoint load / host-side batch construction).
+    Important (MindSpore 2.7 + Ascend): ``ms.Tensor(numpy/list)`` stays on
+    **CPU** even after ``set_device('Ascend')``. Only ``ops.*`` factories and
+    ``Tensor.move_to('Ascend')`` place storage on NPU. Never treat a fresh
+    ``ms.Tensor(np_array)`` as already on-device.
     """
     if tensor is None or device is None:
         return tensor
@@ -140,7 +141,7 @@ def maybe_move_tensor(
     except Exception:
         pass
 
-    # Prefer native move_to when it works.
+    # Prefer native move_to (CPU -> Ascend works; host rebuild alone does not).
     try:
         moved = tensor.move_to(target)
         if tensor_device_target(moved) == target:
@@ -148,13 +149,11 @@ def maybe_move_tensor(
     except Exception:
         moved = None
 
-    # Recreate on the active process device (most reliable on Ascend).
+    # Rebuild on host then move_to (ms.Tensor(np) alone stays on CPU).
     try:
         ensure_ms_device(target)
-        recreated = ms.Tensor(tensor.asnumpy(), dtype=tensor.dtype)
-        if tensor_device_target(recreated) == target:
-            return recreated
-        recreated = recreated.move_to(target)
+        host = ms.Tensor(tensor.asnumpy(), dtype=tensor.dtype)
+        recreated = host.move_to(target)
         if tensor_device_target(recreated) == target:
             return recreated
     except Exception as exc:
@@ -170,6 +169,26 @@ def maybe_move_tensor(
             f"move to {target}"
         )
     return recreated
+
+
+def make_ms_tensor(
+    data,
+    dtype=None,
+    device: Optional[Union[str, object]] = None,
+) -> Tensor:
+    """
+    Create a Tensor and optionally place it on ``device``.
+
+    Use this instead of bare ``ms.Tensor(list/np)`` when the value must live
+    on Ascend — host constructors stay on CPU on MS 2.7.
+    """
+    if dtype is None:
+        t = ms.Tensor(data)
+    else:
+        t = ms.Tensor(data, dtype)
+    if device is None:
+        return t
+    return maybe_move_tensor(t, device, strict=True)
 
 
 def move_net_to_device(
@@ -197,11 +216,11 @@ def move_net_to_device(
         try:
             if tensor_device_target(param) == target:
                 continue
-            # Allocate on the *current* process device (set above).
-            new_data = ms.Tensor(param.asnumpy(), dtype=param.dtype)
+            # Allocate on host then move (bare Tensor(np) stays on CPU).
+            new_data = ms.Tensor(param.asnumpy(), dtype=param.dtype).move_to(
+                target
+            )
             param.set_data(new_data)
-            if tensor_device_target(param) != target:
-                param.set_data(param.data.move_to(target))
             if tensor_device_target(param) != target:
                 failed.append(f"{name}-> {param.device}")
         except Exception as exc:

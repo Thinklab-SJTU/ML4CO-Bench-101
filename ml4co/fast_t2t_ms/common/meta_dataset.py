@@ -88,7 +88,15 @@ class MetaDataBatch(object):
         self.edge_index = ops.cat(edge_indices, axis=1)
         self.ground_truth = ops.cat(ground_truths, axis=0)
         self.batch = ops.cat(batch_vecs, axis=0)
-        self.ptr = ms.Tensor(ptr, ms.int32)
+        # ms.Tensor(list) stays on CPU on Ascend — place on active device.
+        from ml4co.ms_utils import current_ms_device, make_ms_tensor
+
+        self.ptr = make_ms_tensor(
+            np.asarray(ptr, dtype=np.int32),
+            ms.int32,
+            device=current_ms_device(),
+        )
+
 
     def to_device(self, device: str = None):
         """

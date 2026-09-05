@@ -7,9 +7,25 @@ from mindspore import Tensor, nn, ops
 from ml4co.fast_t2t_ms.tsp.tsp_env import TSPEnv
 from ml4co.fast_t2t_ms.tsp.module import TSPModel
 from ml4co.ms_utils.type_utils import to_numpy, to_tensor
+from ml4co.ms_utils import make_ms_tensor
 from ml4co.fast_t2t_ms.tsp.tsp_diffusion import TSPDiffusion
 from ml4co.fast_t2t_ms.common import MetaPLModel, MetaDataBatch, InferenceSchedule
 from ml4co.fast_t2t_ms.tsp.lib import c_tsp_greedy, c_tsp_2opt, mindspore_tsp_2opt
+
+
+def _numpy_topk_gather(scores_2d: Tensor, values_2d: Tensor, k: int) -> np.ndarray:
+    """
+    Host top-k + gather.
+
+    Ascend ``ops.topk`` is disproportionately slow here (diagnose: ~160ms vs
+    ~9ms model forward). Greedy already needs numpy edges, so do top-k on CPU.
+    """
+    scores = to_numpy(scores_2d)
+    values = to_numpy(values_2d)
+    k = int(min(k, scores.shape[-1]))
+    # Unsorted top-k indices (faster than full sort)
+    idx = np.argpartition(-scores, kth=k - 1, axis=-1)[..., :k]
+    return np.take_along_axis(values, idx, axis=-1).astype(np.int32)
 
 
 class TSPPLModel(MetaPLModel):
@@ -74,12 +90,14 @@ class TSPPLModel(MetaPLModel):
         # Consistency Sample (Python ints avoid Ascend D2H sync every step)
         t1_i = int(np.random.randint(1, 1001))
         t2_i = int(self.cm_alpha * t1_i)
-        t1 = ms.Tensor([t1_i], ms.int32)
-        t2 = ms.Tensor([t2_i], ms.int32)
+        # Bare ms.Tensor([...]) stays on CPU on Ascend — place explicitly.
+        t1 = make_ms_tensor([t1_i], ms.int32, device=self.env.device)
+        t2 = make_ms_tensor([t2_i], ms.int32, device=self.env.device)
         s1, s2 = self.diffusion.sample(x=gt, t1=t1_i, t2=t2_i)
 
         # Optional for robustness
-        _u0, _u1 = ms.Tensor(0.0, ms.float32), ms.Tensor(1.0, ms.float32)
+        _u0 = make_ms_tensor(0.0, ms.float32, device=self.env.device)
+        _u1 = make_ms_tensor(1.0, ms.float32, device=self.env.device)
         s1 = (s1 * 2 - 1) * (1.0 + 0.05 * ops.uniform(s1.shape, _u0, _u1))
         s2 = (s2 * 2 - 1) * (1.0 + 0.05 * ops.uniform(s2.shape, _u0, _u1))
 
@@ -158,10 +176,11 @@ class TSPPLModel(MetaPLModel):
         for idx in range(inference_steps):
             # Time
             t1, t2 = time_schedule(idx)
-            t1_t = ms.Tensor([t1], ms.int32)
+            t1_t = make_ms_tensor([t1], ms.int32, device=self.env.device)
 
             # Optional for robustness
-            _u0, _u1 = ms.Tensor(0.0, ms.float32), ms.Tensor(1.0, ms.float32)
+            _u0 = make_ms_tensor(0.0, ms.float32, device=self.env.device)
+            _u1 = make_ms_tensor(1.0, ms.float32, device=self.env.device)
             st = (st * 2 - 1) * (1.0 + 0.05 * ops.uniform(st.shape, _u0, _u1))
 
             # Forward
@@ -171,11 +190,10 @@ class TSPPLModel(MetaPLModel):
             if t2 != 0:
                 heatmap = ops.softmax(logits, axis=-1)[:, 1]
                 pred_ber = ops.bernoulli(ops.clip_by_value(heatmap, 0.0, 1.0))
+                on = make_ms_tensor(1.0, ms.float32, device=self.env.device)
+                off = make_ms_tensor(0.0, ms.float32, device=self.env.device)
                 pred_ber_onehot = ops.one_hot(
-                    pred_ber.astype(ms.int32),
-                    2,
-                    ms.Tensor(1.0, ms.float32),
-                    ms.Tensor(0.0, ms.float32),
+                    pred_ber.astype(ms.int32), 2, on, off
                 )
                 Q_bar = self.diffusion.q_bar_at(t2)
                 prob = ops.matmul(pred_ber_onehot.astype(ms.float32), Q_bar)
@@ -190,11 +208,11 @@ class TSPPLModel(MetaPLModel):
         # Match
         avg_match = float(heatmap[gt == 1].mean().asnumpy())
 
-        # Greedy Decode
+        # Greedy Decode (numpy top-k: Ascend ops.topk is ~10-20x slower here)
         heatmap_2d = heatmap.reshape(bs, -1)
-        _, top_idx = ops.topk(heatmap_2d, 20 * nodes_num)
-        top_edges = ops.gather_elements(ed_for_greedy, -1, top_idx)
-        top_edges = to_numpy(top_edges).astype(np.int32)
+        top_edges = _numpy_topk_gather(
+            heatmap_2d, ed_for_greedy, 20 * nodes_num
+        )
         greedy_sols = c_tsp_greedy(
             top_edges=top_edges, nodes_num=nodes_num, num_workers=bs
         )
@@ -226,7 +244,6 @@ class TSPPLModel(MetaPLModel):
         ptr = batch_processed_data.ptr
         pbs = int(ptr.shape[0]) - 1
         nodes_num = batch_task_data[0].nodes_num
-        np_points = to_numpy(points).reshape(pbs, nodes_num, 2)
 
         # 1.2 Get edge index
         edge_index = batch_processed_data.edge_index
@@ -253,35 +270,33 @@ class TSPPLModel(MetaPLModel):
 
         # 2.3 Inference
         heatmap = None
+        on = make_ms_tensor(1.0, ms.float32, device=self.env.device)
+        off = make_ms_tensor(0.0, ms.float32, device=self.env.device)
+        _u0 = make_ms_tensor(0.0, ms.float32, device=self.env.device)
+        _u1 = make_ms_tensor(1.0, ms.float32, device=self.env.device)
         for idx in range(self.cm_steps):
             # Time
             t1, t2 = time_schedule(idx)
-            t1_t = ms.Tensor([t1], ms.int32)
+            t1_t = make_ms_tensor([t1], ms.int32, device=self.env.device)
 
             # Optional for robustness
-            _u0, _u1 = ms.Tensor(0.0, ms.float32), ms.Tensor(1.0, ms.float32)
             st = (st * 2 - 1) * (1.0 + 0.05 * ops.uniform(st.shape, _u0, _u1))
 
             # Multi-step inference
             logits = self.model(points, st, t1_t, edge_index)
-            heatmap: ms.Tensor = ops.softmax(logits, axis=-1)[:, 1]
+            heatmap = ops.softmax(logits, axis=-1)[:, 1]
             if t2 != 0:
-                pred_ber: ms.Tensor = ops.bernoulli(ops.clip_by_value(heatmap, 0.0, 1.0))
+                pred_ber = ops.bernoulli(ops.clip_by_value(heatmap, 0.0, 1.0))
                 pred_ber_onehot = ops.one_hot(
-                    pred_ber.astype(ms.int32),
-                    2,
-                    ms.Tensor(1.0, ms.float32),
-                    ms.Tensor(0.0, ms.float32),
+                    pred_ber.astype(ms.int32), 2, on, off
                 )
                 Q_bar = self.diffusion.q_bar_at(t2)
                 prob = ops.matmul(pred_ber_onehot.astype(ms.float32), Q_bar)
                 st = ops.bernoulli(ops.clip_by_value(prob[..., 1], 0.0, 1.0))
 
-        # 2.4 Greedy decode
+        # 2.4 Greedy decode (numpy top-k; Ascend ops.topk is very slow)
         heatmap = heatmap.reshape(pbs, -1)
-        _, top_idx = ops.topk(heatmap, 20 * nodes_num)
-        top_edges = ops.gather_elements(ed_for_greedy, -1, top_idx)
-        top_edges = to_numpy(top_edges).astype(np.int32)
+        top_edges = _numpy_topk_gather(heatmap, ed_for_greedy, 20 * nodes_num)
         np_greedy_sols = c_tsp_greedy(
             top_edges=top_edges, nodes_num=nodes_num, num_workers=pbs
         )
@@ -301,6 +316,7 @@ class TSPPLModel(MetaPLModel):
             )
             best_sols = to_numpy(best_sols)
         else:
+            np_points = to_numpy(points).reshape(pbs, nodes_num, 2)
             best_sols = c_tsp_2opt(
                 points=np_points, tours=np_greedy_sols, num_workers=pbs
             )
