@@ -6,6 +6,7 @@ from ml4co_kit.learning.extra_backends.mindspore import MSBaseModel
 
 from .meta_env import MetaEnv
 from .meta_dataset import MetaDataBatch
+from .device_utils import ensure_ms_device
 
 
 class MetaPLModel(MSBaseModel):
@@ -26,6 +27,10 @@ class MetaPLModel(MSBaseModel):
         cm_alpha: float = 0.2,
         cm_steps: int = 5,
     ):
+        # Bind MindSpore runtime to env.device before any Cell / Tensor work.
+        device_id = getattr(env, "device_id", 0)
+        ensure_ms_device(env.device, device_id=device_id)
+
         # Super Args
         super().__init__(
             env=env,
@@ -46,9 +51,15 @@ class MetaPLModel(MSBaseModel):
         if weight_path is not None:
             self.load_weights(weight_path)
 
+    def _sync_device(self):
+        """Re-assert process device from ``env`` (MSTrainer may override context)."""
+        device_id = getattr(self.env, "device_id", 0)
+        ensure_ms_device(self.env.device, device_id=device_id)
+
     def shared_step(self, batch: Any, batch_idx: int, phase: str):
         # Set mode for env
         self.env.mode = phase
+        self._sync_device()
 
         # Get data
         batch_task_data, batch_processed_data = batch

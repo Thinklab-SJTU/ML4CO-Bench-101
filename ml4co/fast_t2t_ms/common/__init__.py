@@ -15,3 +15,4 @@ from .meta_env import MetaEnv
 from .meta_dataset import MetaDataset, MetaData, MetaDataBatch
 from .pl_model_base import MetaPLModel
 from .inference import InferenceSchedule
+from .device_utils import normalize_ms_device, set_ms_device, ensure_ms_device

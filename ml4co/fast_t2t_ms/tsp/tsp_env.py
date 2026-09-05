@@ -15,9 +15,10 @@ class TSPEnv(MetaEnv):
         test_dataset: TSPDataset = None,
         num_workers: int = 4,
         device: str = "Ascend",
+        device_id: int = 0,
     ):
         # Super Args
-        super().__init__(
+        super(TSPEnv, self).__init__(
             mode=mode,
             train_batch_size=train_batch_size,
             val_batch_size=val_batch_size,
@@ -26,6 +27,7 @@ class TSPEnv(MetaEnv):
             test_dataset=test_dataset,
             num_workers=num_workers,
             device=device,
+            device_id=device_id,
         )
 
     def process_batch_data(

@@ -1,8 +1,8 @@
 from typing import List, Tuple
-
 from ml4co_kit import TaskBase, BaseEnv
 from ml4co_kit.learning.extra_backends.mindspore import MSDataLoader
 from .meta_dataset import MetaDataset, MetaDataBatch
+from .device_utils import normalize_ms_device, set_ms_device
 
 
 class MetaEnv(BaseEnv):
@@ -15,10 +15,16 @@ class MetaEnv(BaseEnv):
         val_dataset: MetaDataset = None,
         test_dataset: MetaDataset = None,
         num_workers: int = 4,
-        device: str = "Ascend",
+        device: str = "Ascend", # ['Ascend', 'GPU', 'CPU']
+        device_id: int = 0,
     ):
+        # Align MindSpore process device with env.device (CPU / GPU / Ascend).
+        device = normalize_ms_device(device)
+        self.device_id = int(device_id)
+        set_ms_device(device, device_id=self.device_id)
+
         # Super Args
-        super().__init__(
+        super(MetaEnv, self).__init__(
             name="MetaEnv",
             mode=mode,
             train_batch_size=train_batch_size,

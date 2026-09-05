@@ -52,9 +52,9 @@ class TSPPLModel(MetaPLModel):
         self._ce_loss = nn.CrossEntropyLoss()
 
     def _maybe_to_device(self, batch_processed_data: MetaDataBatch):
-        device = self.env.device
-        if device and str(device).lower() not in ("cpu",):
-            batch_processed_data.to_device(device)
+        # Process context + tensor storage must both match env.device.
+        self._sync_device()
+        batch_processed_data.to_device(self.env.device)
 
     def _train_step(
         self,

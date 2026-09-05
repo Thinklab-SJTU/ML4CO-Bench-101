@@ -92,11 +92,15 @@ class MetaDataBatch(object):
 
     def to_device(self, device: str = None):
         """
-        Move tensors to the active MindSpore device context.
+        Move batch tensors onto ``device``.
 
-        ``device`` is kept for API parity with the PyTorch ``to_cuda``;
-        MindSpore placement is primarily controlled by ``ms.set_context``.
+        MindSpore still needs a matching process ``device_target`` (see
+        ``set_ms_device``); this only places the Tensor storage.
         """
+        from .device_utils import normalize_ms_device
+
+        if device is not None:
+            device = normalize_ms_device(device)
         self.node_feature = self._maybe_move(self.node_feature, device)
         self.edge_feature = self._maybe_move(self.edge_feature, device)
         self.edge_index = self._maybe_move(self.edge_index, device)
@@ -109,12 +113,13 @@ class MetaDataBatch(object):
 
     @staticmethod
     def _maybe_move(tensor: Tensor, device: str = None) -> Tensor:
-        if tensor is None:
-            return None
-        if device is None or device.lower() in ("cpu",):
+        if tensor is None or device is None:
             return tensor
+        from .device_utils import normalize_ms_device
+
+        target = normalize_ms_device(device)
         try:
-            return tensor.move_to(device)
+            return tensor.move_to(target)
         except Exception:
             return tensor
 
