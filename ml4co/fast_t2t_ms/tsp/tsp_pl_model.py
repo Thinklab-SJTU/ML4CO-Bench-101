@@ -13,21 +13,6 @@ from ml4co.fast_t2t_ms.common import MetaPLModel, MetaDataBatch, InferenceSchedu
 from ml4co.fast_t2t_ms.tsp.lib import c_tsp_greedy, c_tsp_2opt, mindspore_tsp_2opt
 
 
-def _numpy_topk_gather(scores_2d: Tensor, values_2d: Tensor, k: int) -> np.ndarray:
-    """
-    Host top-k + gather.
-
-    Ascend ``ops.topk`` is disproportionately slow here (diagnose: ~160ms vs
-    ~9ms model forward). Greedy already needs numpy edges, so do top-k on CPU.
-    """
-    scores = to_numpy(scores_2d)
-    values = to_numpy(values_2d)
-    k = int(min(k, scores.shape[-1]))
-    # Unsorted top-k indices (faster than full sort)
-    idx = np.argpartition(-scores, kth=k - 1, axis=-1)[..., :k]
-    return np.take_along_axis(values, idx, axis=-1).astype(np.int32)
-
-
 class TSPPLModel(MetaPLModel):
     def __init__(
         self,
@@ -208,11 +193,11 @@ class TSPPLModel(MetaPLModel):
         # Match
         avg_match = float(heatmap[gt == 1].mean().asnumpy())
 
-        # Greedy Decode (numpy top-k: Ascend ops.topk is ~10-20x slower here)
+        # Greedy Decode (same as PyTorch: sorted topk + gather)
         heatmap_2d = heatmap.reshape(bs, -1)
-        top_edges = _numpy_topk_gather(
-            heatmap_2d, ed_for_greedy, 20 * nodes_num
-        )
+        _, top_idx = ops.topk(heatmap_2d, 20 * nodes_num)
+        top_edges = ops.gather_elements(ed_for_greedy, -1, top_idx)
+        top_edges = to_numpy(top_edges).astype(np.int32)
         greedy_sols = c_tsp_greedy(
             top_edges=top_edges, nodes_num=nodes_num, num_workers=bs
         )
@@ -294,9 +279,11 @@ class TSPPLModel(MetaPLModel):
                 prob = ops.matmul(pred_ber_onehot.astype(ms.float32), Q_bar)
                 st = ops.bernoulli(ops.clip_by_value(prob[..., 1], 0.0, 1.0))
 
-        # 2.4 Greedy decode (numpy top-k; Ascend ops.topk is very slow)
+        # 2.4 Greedy decode (same as PyTorch: sorted topk + gather)
         heatmap = heatmap.reshape(pbs, -1)
-        top_edges = _numpy_topk_gather(heatmap, ed_for_greedy, 20 * nodes_num)
+        _, top_idx = ops.topk(heatmap, 20 * nodes_num)
+        top_edges = ops.gather_elements(ed_for_greedy, -1, top_idx)
+        top_edges = to_numpy(top_edges).astype(np.int32)
         np_greedy_sols = c_tsp_greedy(
             top_edges=top_edges, nodes_num=nodes_num, num_workers=pbs
         )
