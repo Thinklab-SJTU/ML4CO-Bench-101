@@ -6,7 +6,7 @@ from ml4co_kit.learning.extra_backends.mindspore import MSBaseModel
 
 from .meta_env import MetaEnv
 from .meta_dataset import MetaDataBatch
-from .device_utils import ensure_ms_device
+from ml4co.ms_utils import ensure_ms_device
 
 
 class MetaPLModel(MSBaseModel):
@@ -52,7 +52,7 @@ class MetaPLModel(MSBaseModel):
             self.load_weights(weight_path)
 
     def _sync_device(self):
-        """Re-assert process device from ``env`` (MSTrainer may override context)."""
+        """Cheap no-op when already on ``env.device`` (cached in ms_utils)."""
         device_id = getattr(self.env, "device_id", 0)
         ensure_ms_device(self.env.device, device_id=device_id)
 

@@ -3,7 +3,7 @@ import mindspore as ms
 from mindspore import ops
 from sklearn.neighbors import KDTree
 from ml4co_kit import TSPWrapper, TSPTask
-from ml4co.ms_utils import to_tensor
+from ml4co.ms_utils.type_utils import to_tensor
 from ml4co.fast_t2t_ms.common import MetaDataset, MetaData
 
 

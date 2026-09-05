@@ -3,7 +3,7 @@ import numpy as np
 from typing import List
 from ml4co_kit import SOLVER_TYPE, SolverBase, TaskBase
 from ml4co.fast_t2t_ms.common import MetaPLModel
-from ml4co.fast_t2t_ms.common.device_utils import ensure_ms_device
+from ml4co.ms_utils import ensure_ms_device
 
 
 class FastT2TMSSolver(SolverBase):

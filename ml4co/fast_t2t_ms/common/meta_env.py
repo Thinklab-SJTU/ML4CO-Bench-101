@@ -2,7 +2,7 @@ from typing import List, Tuple
 from ml4co_kit import TaskBase, BaseEnv
 from ml4co_kit.learning.extra_backends.mindspore import MSDataLoader
 from .meta_dataset import MetaDataset, MetaDataBatch
-from .device_utils import normalize_ms_device, set_ms_device
+from ml4co.ms_utils import normalize_ms_device, set_ms_device
 
 
 class MetaEnv(BaseEnv):

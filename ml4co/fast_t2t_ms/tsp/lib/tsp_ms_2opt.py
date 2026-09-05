@@ -1,6 +1,6 @@
 import mindspore as ms
 from mindspore import Tensor
-from ml4co.ms_utils import to_numpy, to_tensor
+from ml4co.ms_utils.type_utils import to_numpy, to_tensor
 from .tsp_2opt import c_tsp_2opt
 
 

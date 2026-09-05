@@ -94,34 +94,28 @@ class MetaDataBatch(object):
         """
         Move batch tensors onto ``device``.
 
-        MindSpore still needs a matching process ``device_target`` (see
-        ``set_ms_device``); this only places the Tensor storage.
+        Skips ``move_to`` when a tensor is already on the target device
+        (repeated Ascend ``move_to`` is expensive).
         """
-        from .device_utils import normalize_ms_device
+        from ml4co.ms_utils import normalize_ms_device, maybe_move_tensor
 
         if device is not None:
             device = normalize_ms_device(device)
-        self.node_feature = self._maybe_move(self.node_feature, device)
-        self.edge_feature = self._maybe_move(self.edge_feature, device)
-        self.edge_index = self._maybe_move(self.edge_index, device)
-        self.ground_truth = self._maybe_move(self.ground_truth, device)
-        self.batch = self._maybe_move(self.batch, device)
-        self.ptr = self._maybe_move(self.ptr, device)
+        self.node_feature = maybe_move_tensor(self.node_feature, device)
+        self.edge_feature = maybe_move_tensor(self.edge_feature, device)
+        self.edge_index = maybe_move_tensor(self.edge_index, device)
+        self.ground_truth = maybe_move_tensor(self.ground_truth, device)
+        self.batch = maybe_move_tensor(self.batch, device)
+        self.ptr = maybe_move_tensor(self.ptr, device)
 
     # Alias used by PyTorch code paths
     to_cuda = to_device
 
     @staticmethod
     def _maybe_move(tensor: Tensor, device: str = None) -> Tensor:
-        if tensor is None or device is None:
-            return tensor
-        from .device_utils import normalize_ms_device
+        from ml4co.ms_utils import maybe_move_tensor
 
-        target = normalize_ms_device(device)
-        try:
-            return tensor.move_to(target)
-        except Exception:
-            return tensor
+        return maybe_move_tensor(tensor, device)
 
 
 class MetaDataset(MSDataset):
