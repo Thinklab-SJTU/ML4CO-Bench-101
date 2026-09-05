@@ -61,3 +61,6 @@ wandb/**
 
 # history
 his/**
+
+# mindspore 
+kernel_meta/**
