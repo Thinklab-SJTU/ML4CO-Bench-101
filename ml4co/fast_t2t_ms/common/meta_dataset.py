@@ -1,8 +1,8 @@
 import os
-import numpy as np
-import mindspore as ms
 from typing import List, Tuple
-from mindspore import Tensor, ops
+from mindspore import Tensor
+import mindspore as ms
+import numpy as np
 from ml4co_kit import WrapperBase, TaskBase
 from ml4co_kit.learning.extra_backends.mindspore import MSDataset
 
@@ -59,8 +59,12 @@ class MetaDataBatch(object):
         """
         Combine a list of MetaData into this MetaDataBatch by concatenating
         nodes/edges and offsetting edge_index, matching PyG Batch semantics.
+
+        Concatenation is done on **host NumPy** to avoid Ascend ``ops.cat`` /
+        ``ops.full`` launch overhead during solve preprocessing.
         """
-        # Initialize lists
+        from ml4co.ms_utils.type_utils import to_numpy
+
         node_features = []
         edge_features = []
         edge_indices = []
@@ -68,34 +72,39 @@ class MetaDataBatch(object):
         batch_vecs = []
         ptr = [0]
         node_offset = 0
+        has_gt = data_list[0].ground_truth is not None
 
-        # Process data
         for i, data in enumerate(data_list):
-            num_nodes = int(data.node_feature.shape[0])
-            node_features.append(data.node_feature)
-            edge_features.append(data.edge_feature)
-            edge_indices.append(data.edge_index + node_offset)
-            ground_truths.append(data.ground_truth)
-            batch_vecs.append(
-                ops.full((num_nodes,), fill_value=i).astype(ms.int32)
-            )
+            nf = to_numpy(data.node_feature)
+            ef = to_numpy(data.edge_feature)
+            ei = to_numpy(data.edge_index).astype(np.int32, copy=False)
+            num_nodes = int(nf.shape[0])
+
+            node_features.append(nf)
+            edge_features.append(ef)
+            edge_indices.append(ei + node_offset)
+            if has_gt:
+                ground_truths.append(to_numpy(data.ground_truth))
+            batch_vecs.append(np.full((num_nodes,), i, dtype=np.int32))
             node_offset += num_nodes
             ptr.append(node_offset)
 
-        # Update attributes
-        self.node_feature = ops.cat(node_features, axis=0)
-        self.edge_feature = ops.cat(edge_features, axis=0)
-        self.edge_index = ops.cat(edge_indices, axis=1)
-        self.ground_truth = ops.cat(ground_truths, axis=0)
-        self.batch = ops.cat(batch_vecs, axis=0)
-        # ms.Tensor(list) stays on CPU on Ascend — place on active device.
-        from ml4co.ms_utils import current_ms_device, make_ms_tensor
-
-        self.ptr = make_ms_tensor(
-            np.asarray(ptr, dtype=np.int32),
-            ms.int32,
-            device=current_ms_device(),
+        # Host tensors; ``to_device`` moves them once onto Ascend/GPU/CPU.
+        self.node_feature = ms.Tensor(
+            np.concatenate(node_features, axis=0).astype(np.float32, copy=False)
         )
+        self.edge_feature = ms.Tensor(
+            np.concatenate(edge_features, axis=0).astype(np.float32, copy=False)
+        )
+        self.edge_index = ms.Tensor(np.concatenate(edge_indices, axis=1))
+        if has_gt:
+            self.ground_truth = ms.Tensor(
+                np.concatenate(ground_truths, axis=0).astype(np.int32, copy=False)
+            )
+        else:
+            self.ground_truth = None
+        self.batch = ms.Tensor(np.concatenate(batch_vecs, axis=0))
+        self.ptr = ms.Tensor(np.asarray(ptr, dtype=np.int32))
 
 
     def to_device(self, device: str = None):
