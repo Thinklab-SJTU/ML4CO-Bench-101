@@ -199,11 +199,9 @@ def move_net_to_device(
     strict: bool = True,
 ) -> str:
     """
-    Move all ``Parameter``s of a ``nn.Cell`` onto ``device``.
+    Move all ``Parameter``s of a ``nn.Cell`` onto ``device`` (one-shot).
 
-    Prefer recreating parameter data with ``ms.Tensor(...)`` **after**
-    ``ensure_ms_device``, so storage is allocated on the active device.
-    ``Parameter.move_to`` + ``set_data`` alone is unreliable on some Ascend builds.
+    Prefer ``Parameter.move_to``; fall back to host copy + ``move_to``.
     """
     from mindspore import nn as ms_nn
 
@@ -216,11 +214,14 @@ def move_net_to_device(
         try:
             if tensor_device_target(param) == target:
                 continue
-            # Allocate on host then move (bare Tensor(np) stays on CPU).
-            new_data = ms.Tensor(param.asnumpy(), dtype=param.dtype).move_to(
-                target
-            )
-            param.set_data(new_data)
+            try:
+                moved = param.move_to(target)
+                param.set_data(moved)
+            except Exception:
+                new_data = ms.Tensor(param.asnumpy(), dtype=param.dtype).move_to(
+                    target
+                )
+                param.set_data(new_data)
             if tensor_device_target(param) != target:
                 failed.append(f"{name}-> {param.device}")
         except Exception as exc:

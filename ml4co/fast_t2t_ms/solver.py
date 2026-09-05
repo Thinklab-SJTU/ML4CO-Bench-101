@@ -3,7 +3,6 @@ import numpy as np
 from typing import List
 from ml4co_kit import SOLVER_TYPE, SolverBase, TaskBase
 from ml4co.fast_t2t_ms.common import MetaPLModel
-from ml4co.ms_utils import ensure_ms_device
 
 
 class FastT2TMSSolver(SolverBase):
@@ -20,9 +19,6 @@ class FastT2TMSSolver(SolverBase):
 
         # Attributes
         self.pl_model = pl_model
-        # Honor env.device (CPU / GPU / Ascend) for the whole solve process.
-        device_id = getattr(self.pl_model.env, "device_id", 0)
-        ensure_ms_device(self.pl_model.env.device, device_id=device_id)
         self.pl_model.set_train(False)
         for p in self.pl_model.get_parameters():
             p.requires_grad = False
@@ -32,19 +28,11 @@ class FastT2TMSSolver(SolverBase):
     def set_seed(self, seed: int):
         random.seed(seed)
         np.random.seed(seed)
-        try:
-            import mindspore as ms
-            ms.set_seed(seed)
-        except Exception:
-            pass
 
     def _solve(self, task_data: TaskBase):
         return self._batch_solve([task_data])
 
     def _batch_solve(self, batch_task_data: List[TaskBase]):
-        device_id = getattr(self.pl_model.env, "device_id", 0)
-        ensure_ms_device(self.pl_model.env.device, device_id=device_id)
-
         # Process batch data
         batch_task_data, batch_processed_data = \
         self.pl_model.env.process_batch_data(

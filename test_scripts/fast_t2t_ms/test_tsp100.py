@@ -13,8 +13,8 @@ from ml4co.fast_t2t_ms import TSPModel, TSPEnv, TSPPLModel, FastT2TMSSolver
 
 
 # Settings
-# MindSpore: "CPU" | "GPU" | "Ascend"  (aliases: cpu, cuda/gpu, npu)
-DEVICE = "CPU"
+# MindSpore: "CPU" | "GPU" | "Ascend"
+DEVICE = "Ascend"
 DEVICE_ID = 0
 TEST_DATA_PATH = TSP100_TEST_PATH
 WEIGHT_PATH = f"weights/fast_t2t_ms/tsp100_fast_t2t.ckpt"
@@ -25,7 +25,7 @@ BATCH_SIZE = 1
 
 # Main
 if __name__ == "__main__":
-    # Create Environment (sets MindSpore process device)
+    # Create Environment (sets MindSpore process device once)
     env = TSPEnv(mode="solve", device=DEVICE, device_id=DEVICE_ID)
 
     # Create Model

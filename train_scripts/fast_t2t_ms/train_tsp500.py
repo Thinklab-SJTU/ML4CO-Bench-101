@@ -45,7 +45,7 @@ if __name__ == "__main__":
         data_path=VAL_PATH,
     )
 
-    # Create Environment (device must match MSTrainer.device_target)
+    # Create Environment
     env = TSPEnv(
         train_dataset=train_dataset,
         val_dataset=val_dataset,
@@ -53,8 +53,7 @@ if __name__ == "__main__":
         train_batch_size=BATCH_SIZE,
         val_batch_size=BATCH_SIZE,
         num_workers=DATASET_NUM_WORKERS,
-        device=DEVICE_TARGET,
-        device_id=DEVICE_ID,
+        device=DEVICE_TARGET, device_id=DEVICE_ID
     )
     
     # Create Model

@@ -6,9 +6,8 @@ from typing import List, Dict, Tuple
 from mindspore import Tensor, nn, ops
 from ml4co.fast_t2t_ms.tsp.tsp_env import TSPEnv
 from ml4co.fast_t2t_ms.tsp.module import TSPModel
-from ml4co.ms_utils.type_utils import to_numpy, to_tensor
-from ml4co.ms_utils import make_ms_tensor
 from ml4co.fast_t2t_ms.tsp.tsp_diffusion import TSPDiffusion
+from ml4co.fast_t2t_ms.common.type_utils import to_numpy, to_tensor
 from ml4co.fast_t2t_ms.common import MetaPLModel, MetaDataBatch, InferenceSchedule
 from ml4co.fast_t2t_ms.tsp.lib import c_tsp_greedy, c_tsp_2opt, mindspore_tsp_2opt
 
@@ -29,7 +28,7 @@ class TSPPLModel(MetaPLModel):
         ms_2opt: bool = False,
     ):
         # Super Args
-        super(TSPPLModel, self).__init__(
+        super().__init__(
             env=env,
             model=model,
             lr_scheduler=lr_scheduler,
@@ -40,9 +39,8 @@ class TSPPLModel(MetaPLModel):
             cm_steps=cm_steps,
         )
 
-        # Diffusion Args (cache Q_bar on env.device; avoids host→device every step)
+        # Diffusion Args
         self.diffusion = TSPDiffusion(T=1000)
-        self.diffusion.to_device(self.env.device)
 
         # TSP Args
         self.knn = knn
@@ -53,13 +51,10 @@ class TSPPLModel(MetaPLModel):
         self.model: TSPModel
         self._ce_loss = nn.CrossEntropyLoss()
 
-        # Re-place params after subclass modules are attached.
-        self.to_device()
-
     def _maybe_to_device(self, batch_processed_data: MetaDataBatch):
-        # Process context + tensor storage must both match env.device.
-        self._sync_device()
-        batch_processed_data.to_device(self.env.device)
+        device = self.env.device
+        if device and str(device).lower() not in ("cpu",):
+            batch_processed_data.to_device(device)
 
     def _train_step(
         self,
@@ -72,17 +67,13 @@ class TSPPLModel(MetaPLModel):
         edge_index = batch_processed_data.edge_index
         gt = batch_processed_data.ground_truth.astype(ms.float32)
 
-        # Consistency Sample (Python ints avoid Ascend D2H sync every step)
-        t1_i = int(np.random.randint(1, 1001))
-        t2_i = int(self.cm_alpha * t1_i)
-        # Bare ms.Tensor([...]) stays on CPU on Ascend — place explicitly.
-        t1 = make_ms_tensor([t1_i], ms.int32, device=self.env.device)
-        t2 = make_ms_tensor([t2_i], ms.int32, device=self.env.device)
-        s1, s2 = self.diffusion.sample(x=gt, t1=t1_i, t2=t2_i)
+        # Consistency Sample
+        t1 = ops.randint(1, 1001, (1,), dtype=ms.int32)
+        t2 = ops.cast(self.cm_alpha * t1.astype(ms.float32), ms.int32)
+        s1, s2 = self.diffusion.sample(x=gt, t1=t1, t2=t2)
 
         # Optional for robustness
-        _u0 = make_ms_tensor(0.0, ms.float32, device=self.env.device)
-        _u1 = make_ms_tensor(1.0, ms.float32, device=self.env.device)
+        _u0, _u1 = ms.Tensor(0.0, ms.float32), ms.Tensor(1.0, ms.float32)
         s1 = (s1 * 2 - 1) * (1.0 + 0.05 * ops.uniform(s1.shape, _u0, _u1))
         s2 = (s2 * 2 - 1) * (1.0 + 0.05 * ops.uniform(s2.shape, _u0, _u1))
 
@@ -161,11 +152,10 @@ class TSPPLModel(MetaPLModel):
         for idx in range(inference_steps):
             # Time
             t1, t2 = time_schedule(idx)
-            t1_t = make_ms_tensor([t1], ms.int32, device=self.env.device)
+            t1_t = ms.Tensor([t1], ms.int32)
 
             # Optional for robustness
-            _u0 = make_ms_tensor(0.0, ms.float32, device=self.env.device)
-            _u1 = make_ms_tensor(1.0, ms.float32, device=self.env.device)
+            _u0, _u1 = ms.Tensor(0.0, ms.float32), ms.Tensor(1.0, ms.float32)
             st = (st * 2 - 1) * (1.0 + 0.05 * ops.uniform(st.shape, _u0, _u1))
 
             # Forward
@@ -173,29 +163,31 @@ class TSPPLModel(MetaPLModel):
 
             # Get next st
             if t2 != 0:
-                heatmap = ops.softmax(logits, axis=-1)[:, 1]
+                heatmap = nn.Softmax(axis=-1)(logits)[:, 1]
                 pred_ber = ops.bernoulli(ops.clip_by_value(heatmap, 0.0, 1.0))
-                on = make_ms_tensor(1.0, ms.float32, device=self.env.device)
-                off = make_ms_tensor(0.0, ms.float32, device=self.env.device)
                 pred_ber_onehot = ops.one_hot(
-                    pred_ber.astype(ms.int32), 2, on, off
+                    pred_ber.astype(ms.int32),
+                    2,
+                    ms.Tensor(1.0, ms.float32),
+                    ms.Tensor(0.0, ms.float32),
                 )
-                Q_bar = self.diffusion.q_bar_at(t2)
+                Q_bar = ms.Tensor(self.diffusion.Q_bar[t2], ms.float32)
                 prob = ops.matmul(pred_ber_onehot.astype(ms.float32), Q_bar)
                 st = ops.bernoulli(ops.clip_by_value(prob[..., 1], 0.0, 1.0))
 
         # Loss
         loss = self._ce_loss(logits, gt.astype(ms.int32))
 
-        # Get heatmap (ops.softmax — never construct nn.Softmax per call on Ascend)
-        heatmap = ops.softmax(logits, axis=-1)[:, 1]
+        # Get heatmap
+        heatmap = nn.Softmax(axis=-1)(logits)[:, 1]
 
         # Match
         avg_match = float(heatmap[gt == 1].mean().asnumpy())
 
-        # Greedy Decode (same as PyTorch: sorted topk + gather)
+        # Greedy Decode
         heatmap_2d = heatmap.reshape(bs, -1)
-        _, top_idx = ops.topk(heatmap_2d, 20 * nodes_num)
+        topk = ops.TopK(sorted=True)
+        _, top_idx = topk(heatmap_2d, 20 * nodes_num)
         top_edges = ops.gather_elements(ed_for_greedy, -1, top_idx)
         top_edges = to_numpy(top_edges).astype(np.int32)
         greedy_sols = c_tsp_greedy(
@@ -229,6 +221,7 @@ class TSPPLModel(MetaPLModel):
         ptr = batch_processed_data.ptr
         pbs = int(ptr.shape[0]) - 1
         nodes_num = batch_task_data[0].nodes_num
+        np_points = to_numpy(points).reshape(pbs, nodes_num, 2)
 
         # 1.2 Get edge index
         edge_index = batch_processed_data.edge_index
@@ -255,33 +248,34 @@ class TSPPLModel(MetaPLModel):
 
         # 2.3 Inference
         heatmap = None
-        on = make_ms_tensor(1.0, ms.float32, device=self.env.device)
-        off = make_ms_tensor(0.0, ms.float32, device=self.env.device)
-        _u0 = make_ms_tensor(0.0, ms.float32, device=self.env.device)
-        _u1 = make_ms_tensor(1.0, ms.float32, device=self.env.device)
         for idx in range(self.cm_steps):
             # Time
             t1, t2 = time_schedule(idx)
-            t1_t = make_ms_tensor([t1], ms.int32, device=self.env.device)
+            t1_t = ms.Tensor([t1], ms.int32)
 
             # Optional for robustness
+            _u0, _u1 = ms.Tensor(0.0, ms.float32), ms.Tensor(1.0, ms.float32)
             st = (st * 2 - 1) * (1.0 + 0.05 * ops.uniform(st.shape, _u0, _u1))
 
             # Multi-step inference
             logits = self.model(points, st, t1_t, edge_index)
-            heatmap = ops.softmax(logits, axis=-1)[:, 1]
+            heatmap = nn.Softmax(axis=-1)(logits)[:, 1]
             if t2 != 0:
                 pred_ber = ops.bernoulli(ops.clip_by_value(heatmap, 0.0, 1.0))
                 pred_ber_onehot = ops.one_hot(
-                    pred_ber.astype(ms.int32), 2, on, off
+                    pred_ber.astype(ms.int32),
+                    2,
+                    ms.Tensor(1.0, ms.float32),
+                    ms.Tensor(0.0, ms.float32),
                 )
-                Q_bar = self.diffusion.q_bar_at(t2)
+                Q_bar = ms.Tensor(self.diffusion.Q_bar[t2], ms.float32)
                 prob = ops.matmul(pred_ber_onehot.astype(ms.float32), Q_bar)
                 st = ops.bernoulli(ops.clip_by_value(prob[..., 1], 0.0, 1.0))
 
-        # 2.4 Greedy decode (same as PyTorch: sorted topk + gather)
+        # 2.4 Greedy decode
         heatmap = heatmap.reshape(pbs, -1)
-        _, top_idx = ops.topk(heatmap, 20 * nodes_num)
+        topk = ops.TopK(sorted=True)
+        _, top_idx = topk(heatmap, 20 * nodes_num)
         top_edges = ops.gather_elements(ed_for_greedy, -1, top_idx)
         top_edges = to_numpy(top_edges).astype(np.int32)
         np_greedy_sols = c_tsp_greedy(
@@ -290,20 +284,13 @@ class TSPPLModel(MetaPLModel):
 
         # 2.5 Local search
         if self.ms_2opt:
-            from ml4co.ms_utils import maybe_move_tensor
-
-            th_greedy_sols = maybe_move_tensor(
-                to_tensor(np_greedy_sols).astype(ms.int32),
-                self.env.device,
-                strict=True,
-            )
+            th_greedy_sols = to_tensor(np_greedy_sols).astype(ms.int32)
             points_pbs = points.reshape(pbs, nodes_num, 2)
             best_sols = mindspore_tsp_2opt(
                 points=points_pbs, tours=th_greedy_sols
             )
             best_sols = to_numpy(best_sols)
         else:
-            np_points = to_numpy(points).reshape(pbs, nodes_num, 2)
             best_sols = c_tsp_2opt(
                 points=np_points, tours=np_greedy_sols, num_workers=pbs
             )

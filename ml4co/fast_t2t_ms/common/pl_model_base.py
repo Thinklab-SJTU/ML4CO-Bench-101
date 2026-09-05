@@ -1,8 +1,10 @@
+from typing import Any, Dict, List
+
 from mindspore import nn
 from ml4co_kit import TaskBase
-from typing import Any, Dict, List
 from ml4co_kit.learning.extra_backends.mindspore import MSBaseModel
-from ml4co.ms_utils import ensure_ms_device, move_net_to_device, summarize_net_devices
+from ml4co.ms_utils import move_net_to_device
+
 from .meta_env import MetaEnv
 from .meta_dataset import MetaDataBatch
 
@@ -25,12 +27,8 @@ class MetaPLModel(MSBaseModel):
         cm_alpha: float = 0.2,
         cm_steps: int = 5,
     ):
-        # Bind MindSpore runtime to env.device before any Cell / Tensor work.
-        device_id = getattr(env, "device_id", 0)
-        ensure_ms_device(env.device, device_id=device_id)
-
         # Super Args
-        super(MetaPLModel, self).__init__(
+        super().__init__(
             env=env,
             model=model,
             lr_scheduler=lr_scheduler,
@@ -45,49 +43,25 @@ class MetaPLModel(MSBaseModel):
         self.cm_alpha = cm_alpha
         self.cm_steps = cm_steps
 
-        # Load pretrained weights if needed, then place params on env.device.
-        # Checkpoints / CPU-built nets otherwise stay on CPU and Ascend looks "10x slow".
+        # Load pretrained weights if needed, then place params once on env.device.
+        # (Hot path intentionally matches 3ea716c — no per-step device sync.)
         if weight_path is not None:
             self.load_weights(weight_path)
         else:
-            self.to_device()
+            self._place_on_env_device()
 
-    def to_device(self, device: str = None, device_id: int = None):
-        """Move this Cell (and nested ``model``) onto ``env.device`` (or override)."""
-        if device is None:
-            device = self.env.device
-        if device_id is None:
-            device_id = getattr(self.env, "device_id", 0)
-        move_net_to_device(self, device, device_id=device_id, strict=True)
-        # Also move nested backbone explicitly (defensive).
-        if getattr(self, "model", None) is not None:
-            move_net_to_device(self.model, device, device_id=device_id, strict=True)
-        summary = summarize_net_devices(self)
-        print(f"[mindspore] net devices after to_device({device}): {summary}")
-        if summary and device not in summary:
-            raise RuntimeError(
-                f"Expected parameters on {device}, got device summary {summary}"
-            )
-        if len(summary) > 1:
-            raise RuntimeError(
-                f"Parameters split across devices after to_device: {summary}"
-            )
-        return self
+    def _place_on_env_device(self):
+        """One-shot parameter placement after build / checkpoint load."""
+        device_id = getattr(self.env, "device_id", 0)
+        move_net_to_device(self, self.env.device, device_id=device_id, strict=False)
 
     def load_weights(self, ckpt_path: str):
-        """Load checkpoint then place parameters on ``env.device``."""
         super().load_weights(ckpt_path)
-        self.to_device()
-
-    def _sync_device(self):
-        """Cheap no-op when already on ``env.device`` (cached in ms_utils)."""
-        device_id = getattr(self.env, "device_id", 0)
-        ensure_ms_device(self.env.device, device_id=device_id)
+        self._place_on_env_device()
 
     def shared_step(self, batch: Any, batch_idx: int, phase: str):
         # Set mode for env
         self.env.mode = phase
-        self._sync_device()
 
         # Get data
         batch_task_data, batch_processed_data = batch

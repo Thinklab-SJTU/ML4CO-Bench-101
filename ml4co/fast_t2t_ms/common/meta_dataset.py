@@ -1,8 +1,8 @@
 import os
-from typing import List, Tuple
-from mindspore import Tensor
-import mindspore as ms
 import numpy as np
+import mindspore as ms
+from typing import List, Tuple
+from mindspore import Tensor, ops
 from ml4co_kit import WrapperBase, TaskBase
 from ml4co_kit.learning.extra_backends.mindspore import MSDataset
 
@@ -59,12 +59,8 @@ class MetaDataBatch(object):
         """
         Combine a list of MetaData into this MetaDataBatch by concatenating
         nodes/edges and offsetting edge_index, matching PyG Batch semantics.
-
-        Concatenation is done on **host NumPy** to avoid Ascend ``ops.cat`` /
-        ``ops.full`` launch overhead during solve preprocessing.
         """
-        from ml4co.ms_utils.type_utils import to_numpy
-
+        # Initialize lists
         node_features = []
         edge_features = []
         edge_indices = []
@@ -72,75 +68,55 @@ class MetaDataBatch(object):
         batch_vecs = []
         ptr = [0]
         node_offset = 0
-        has_gt = data_list[0].ground_truth is not None
 
+        # Process data
         for i, data in enumerate(data_list):
-            nf = to_numpy(data.node_feature)
-            ef = to_numpy(data.edge_feature)
-            ei = to_numpy(data.edge_index).astype(np.int32, copy=False)
-            num_nodes = int(nf.shape[0])
-
-            node_features.append(nf)
-            edge_features.append(ef)
-            edge_indices.append(ei + node_offset)
-            if has_gt:
-                ground_truths.append(to_numpy(data.ground_truth))
-            batch_vecs.append(np.full((num_nodes,), i, dtype=np.int32))
+            num_nodes = int(data.node_feature.shape[0])
+            node_features.append(data.node_feature)
+            edge_features.append(data.edge_feature)
+            edge_indices.append(data.edge_index + node_offset)
+            ground_truths.append(data.ground_truth)
+            batch_vecs.append(
+                ops.full((num_nodes,), fill_value=i).astype(ms.int32)
+            )
             node_offset += num_nodes
             ptr.append(node_offset)
 
-        # Host tensors; ``to_device`` moves them once onto Ascend/GPU/CPU.
-        self.node_feature = ms.Tensor(
-            np.concatenate(node_features, axis=0).astype(np.float32, copy=False)
-        )
-        self.edge_feature = ms.Tensor(
-            np.concatenate(edge_features, axis=0).astype(np.float32, copy=False)
-        )
-        self.edge_index = ms.Tensor(np.concatenate(edge_indices, axis=1))
-        if has_gt:
-            self.ground_truth = ms.Tensor(
-                np.concatenate(ground_truths, axis=0).astype(np.int32, copy=False)
-            )
-        else:
-            self.ground_truth = None
-        self.batch = ms.Tensor(np.concatenate(batch_vecs, axis=0))
-        self.ptr = ms.Tensor(np.asarray(ptr, dtype=np.int32))
-
+        # Update attributes
+        self.node_feature = ops.cat(node_features, axis=0)
+        self.edge_feature = ops.cat(edge_features, axis=0)
+        self.edge_index = ops.cat(edge_indices, axis=1)
+        self.ground_truth = ops.cat(ground_truths, axis=0)
+        self.batch = ops.cat(batch_vecs, axis=0)
+        self.ptr = ms.Tensor(ptr, ms.int32)
 
     def to_device(self, device: str = None):
         """
-        Move batch tensors onto ``device``.
+        Move tensors to the active MindSpore device context.
 
-        Skips ``move_to`` when a tensor is already on the target device
-        (repeated Ascend ``move_to`` is expensive).
+        ``device`` is kept for API parity with the PyTorch ``to_cuda``;
+        MindSpore placement is primarily controlled by ``ms.set_context``.
         """
-        from ml4co.ms_utils import normalize_ms_device, maybe_move_tensor
-
-        if device is not None:
-            device = normalize_ms_device(device)
-        # strict=True: silent CPU leftover makes Ascend look extremely slow.
-        self.node_feature = maybe_move_tensor(
-            self.node_feature, device, strict=True
-        )
-        self.edge_feature = maybe_move_tensor(
-            self.edge_feature, device, strict=True
-        )
-        self.edge_index = maybe_move_tensor(
-            self.edge_index, device, strict=True
-        )
-        self.ground_truth = maybe_move_tensor(
-            self.ground_truth, device, strict=True
-        )
-        self.batch = maybe_move_tensor(self.batch, device, strict=True)
-        self.ptr = maybe_move_tensor(self.ptr, device, strict=True)
+        self.node_feature = self._maybe_move(self.node_feature, device)
+        self.edge_feature = self._maybe_move(self.edge_feature, device)
+        self.edge_index = self._maybe_move(self.edge_index, device)
+        self.ground_truth = self._maybe_move(self.ground_truth, device)
+        self.batch = self._maybe_move(self.batch, device)
+        self.ptr = self._maybe_move(self.ptr, device)
 
     # Alias used by PyTorch code paths
     to_cuda = to_device
 
     @staticmethod
     def _maybe_move(tensor: Tensor, device: str = None) -> Tensor:
-        from ml4co.ms_utils import maybe_move_tensor
-        return maybe_move_tensor(tensor, device)
+        if tensor is None:
+            return None
+        if device is None or device.lower() in ("cpu",):
+            return tensor
+        try:
+            return tensor.move_to(device)
+        except Exception:
+            return tensor
 
 
 class MetaDataset(MSDataset):
