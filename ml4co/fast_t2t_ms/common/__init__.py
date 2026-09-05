@@ -19,4 +19,5 @@ from ml4co.ms_utils import (
     normalize_ms_device,
     set_ms_device,
     ensure_ms_device,
+    move_net_to_device,
 )

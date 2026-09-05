@@ -44,13 +44,11 @@ def normalize_ms_device(device: Optional[Union[str, object]]) -> str:
 
 # Return cached active device target, if any.
 def current_ms_device() -> Optional[str]:
-    """Return cached active device target, if any."""
     return None if _ACTIVE is None else _ACTIVE[0]
 
 
 # Canonical device target of a Tensor (``CPU`` / ``GPU`` / ``Ascend``).
 def tensor_device_target(tensor: Tensor) -> str:
-    """Canonical device target of a Tensor (``CPU`` / ``GPU`` / ``Ascend``)."""
     return normalize_ms_device(tensor.device)
 
 
@@ -62,8 +60,6 @@ def set_ms_device(
     force: bool = False,
 ) -> str:
     """
-    Set process-level MindSpore device to match ``device``.
-
     Idempotent: if the process is already on ``(target, device_id)``, this is a
     no-op. Repeated ``ms.set_device`` / ``set_context`` on Ascend is extremely
     costly and was causing ~10x slowdowns when called every train/solve step.
@@ -113,14 +109,15 @@ def set_ms_device(
     return target
 
 
+# No-op when already on the requested device; otherwise call ``set_ms_device``.
 def ensure_ms_device(
     device: Optional[Union[str, object]],
     device_id: int = 0,
 ) -> str:
-    """No-op when already on the requested device; otherwise call ``set_ms_device``."""
     return set_ms_device(device, device_id=device_id, force=False)
 
 
+# No-op when already on the requested device; otherwise call ``move_to``.
 def maybe_move_tensor(tensor: Optional[Tensor], device: Optional[str]) -> Optional[Tensor]:
     """``move_to`` only when the tensor is not already on ``device``."""
     if tensor is None or device is None:
@@ -132,3 +129,38 @@ def maybe_move_tensor(tensor: Optional[Tensor], device: Optional[str]) -> Option
         return tensor.move_to(target)
     except Exception:
         return tensor
+
+
+def move_net_to_device(
+    net: "ms.nn.Cell",
+    device: Optional[Union[str, object]],
+    device_id: int = 0,
+) -> str:
+    """
+    Move all ``Parameter``s of a ``nn.Cell`` onto ``device``.
+
+    MindSpore ``load_checkpoint`` / CPU-constructed nets often leave weights on
+    CPU even after ``ms.set_device('Ascend')``. Call this once after building /
+    loading the model (not every step).
+    """
+    from mindspore import nn as ms_nn
+
+    # No-op when already on the requested device; otherwise call ``ensure_ms_device``.
+    target = ensure_ms_device(device, device_id=device_id)
+    if not isinstance(net, ms_nn.Cell):
+        return target
+
+    # Move all ``Parameter``s of a ``nn.Cell`` onto ``device``.
+    for param in net.get_parameters():
+        try:
+            if tensor_device_target(param) == target:
+                continue
+            # Parameter.move_to returns a Tensor; write it back via set_data.
+            moved = param.move_to(target)
+            param.set_data(moved)
+        except Exception:
+            try:
+                param.set_data(param.data.move_to(target))
+            except Exception:
+                continue
+    return target

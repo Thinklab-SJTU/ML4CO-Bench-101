@@ -4,9 +4,9 @@ import mindspore as ms
 from ml4co_kit import TSPTask
 from typing import List, Dict, Tuple
 from mindspore import Tensor, nn, ops
-from ml4co.ms_utils.type_utils import to_numpy, to_tensor
 from ml4co.fast_t2t_ms.tsp.tsp_env import TSPEnv
 from ml4co.fast_t2t_ms.tsp.module import TSPModel
+from ml4co.ms_utils.type_utils import to_numpy, to_tensor
 from ml4co.fast_t2t_ms.tsp.tsp_diffusion import TSPDiffusion
 from ml4co.fast_t2t_ms.common import MetaPLModel, MetaDataBatch, InferenceSchedule
 from ml4co.fast_t2t_ms.tsp.lib import c_tsp_greedy, c_tsp_2opt, mindspore_tsp_2opt

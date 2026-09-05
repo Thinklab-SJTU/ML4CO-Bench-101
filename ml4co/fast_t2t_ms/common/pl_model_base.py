@@ -6,7 +6,7 @@ from ml4co_kit.learning.extra_backends.mindspore import MSBaseModel
 
 from .meta_env import MetaEnv
 from .meta_dataset import MetaDataBatch
-from ml4co.ms_utils import ensure_ms_device
+from ml4co.ms_utils import ensure_ms_device, move_net_to_device
 
 
 class MetaPLModel(MSBaseModel):
@@ -32,7 +32,7 @@ class MetaPLModel(MSBaseModel):
         ensure_ms_device(env.device, device_id=device_id)
 
         # Super Args
-        super().__init__(
+        super(MetaPLModel, self).__init__(
             env=env,
             model=model,
             lr_scheduler=lr_scheduler,
@@ -47,9 +47,25 @@ class MetaPLModel(MSBaseModel):
         self.cm_alpha = cm_alpha
         self.cm_steps = cm_steps
 
-        # Load pretrained weights if needed
+        # Load pretrained weights if needed, then place params on env.device.
+        # Checkpoints / CPU-built nets otherwise stay on CPU and Ascend looks "10x slow".
         if weight_path is not None:
             self.load_weights(weight_path)
+        self.to_device()
+
+    def to_device(self, device: str = None, device_id: int = None):
+        """Move this Cell (and nested ``model``) onto ``env.device`` (or override)."""
+        if device is None:
+            device = self.env.device
+        if device_id is None:
+            device_id = getattr(self.env, "device_id", 0)
+        move_net_to_device(self, device, device_id=device_id)
+        return self
+
+    def load_weights(self, ckpt_path: str):
+        """Load checkpoint then place parameters on ``env.device``."""
+        super().load_weights(ckpt_path)
+        self.to_device()
 
     def _sync_device(self):
         """Cheap no-op when already on ``env.device`` (cached in ms_utils)."""
