@@ -118,49 +118,115 @@ def ensure_ms_device(
 
 
 # No-op when already on the requested device; otherwise call ``move_to``.
-def maybe_move_tensor(tensor: Optional[Tensor], device: Optional[str]) -> Optional[Tensor]:
-    """``move_to`` only when the tensor is not already on ``device``."""
+def maybe_move_tensor(
+    tensor: Optional[Tensor],
+    device: Optional[str],
+    *,
+    strict: bool = False,
+) -> Optional[Tensor]:
+    """
+    Move ``tensor`` onto ``device`` only when needed.
+
+    Falls back to ``Tensor(asnumpy(), ...)`` after ``ensure_ms_device`` when
+    ``move_to`` fails or leaves storage on the wrong device (common after
+    CPU checkpoint load / host-side batch construction).
+    """
     if tensor is None or device is None:
         return tensor
     target = normalize_ms_device(device)
     try:
         if tensor_device_target(tensor) == target:
             return tensor
-        return tensor.move_to(target)
     except Exception:
-        return tensor
+        pass
+
+    # Prefer native move_to when it works.
+    try:
+        moved = tensor.move_to(target)
+        if tensor_device_target(moved) == target:
+            return moved
+    except Exception:
+        moved = None
+
+    # Recreate on the active process device (most reliable on Ascend).
+    try:
+        ensure_ms_device(target)
+        recreated = ms.Tensor(tensor.asnumpy(), dtype=tensor.dtype)
+        if tensor_device_target(recreated) == target:
+            return recreated
+        recreated = recreated.move_to(target)
+        if tensor_device_target(recreated) == target:
+            return recreated
+    except Exception as exc:
+        if strict:
+            raise RuntimeError(
+                f"Failed to move tensor to {target}: {exc}"
+            ) from exc
+        return tensor if moved is None else moved
+
+    if strict:
+        raise RuntimeError(
+            f"Tensor still on {getattr(recreated, 'device', '?')} after "
+            f"move to {target}"
+        )
+    return recreated
 
 
 def move_net_to_device(
-    net: "ms.nn.Cell",
+    net,
     device: Optional[Union[str, object]],
     device_id: int = 0,
+    *,
+    strict: bool = True,
 ) -> str:
     """
     Move all ``Parameter``s of a ``nn.Cell`` onto ``device``.
 
-    MindSpore ``load_checkpoint`` / CPU-constructed nets often leave weights on
-    CPU even after ``ms.set_device('Ascend')``. Call this once after building /
-    loading the model (not every step).
+    Prefer recreating parameter data with ``ms.Tensor(...)`` **after**
+    ``ensure_ms_device``, so storage is allocated on the active device.
+    ``Parameter.move_to`` + ``set_data`` alone is unreliable on some Ascend builds.
     """
     from mindspore import nn as ms_nn
 
-    # No-op when already on the requested device; otherwise call ``ensure_ms_device``.
     target = ensure_ms_device(device, device_id=device_id)
     if not isinstance(net, ms_nn.Cell):
         return target
 
-    # Move all ``Parameter``s of a ``nn.Cell`` onto ``device``.
-    for param in net.get_parameters():
+    failed = []
+    for name, param in net.parameters_and_names():
         try:
             if tensor_device_target(param) == target:
                 continue
-            # Parameter.move_to returns a Tensor; write it back via set_data.
-            moved = param.move_to(target)
-            param.set_data(moved)
-        except Exception:
-            try:
+            # Allocate on the *current* process device (set above).
+            new_data = ms.Tensor(param.asnumpy(), dtype=param.dtype)
+            param.set_data(new_data)
+            if tensor_device_target(param) != target:
                 param.set_data(param.data.move_to(target))
-            except Exception:
-                continue
+            if tensor_device_target(param) != target:
+                failed.append(f"{name}-> {param.device}")
+        except Exception as exc:
+            failed.append(f"{name}: {exc}")
+
+    if failed and strict:
+        raise RuntimeError(
+            "Failed to move parameters to "
+            f"{target} (device_id={device_id}): {failed[:8]}"
+            + (" ..." if len(failed) > 8 else "")
+        )
     return target
+
+
+def summarize_net_devices(net) -> dict:
+    """Count parameters by device target (for debugging placement)."""
+    from collections import Counter
+    from mindspore import nn as ms_nn
+
+    if not isinstance(net, ms_nn.Cell):
+        return {}
+    counts = Counter()
+    for param in net.get_parameters():
+        try:
+            counts[tensor_device_target(param)] += 1
+        except Exception:
+            counts["unknown"] += 1
+    return dict(counts)

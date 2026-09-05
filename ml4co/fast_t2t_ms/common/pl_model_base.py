@@ -1,12 +1,10 @@
-from typing import Any, Dict, List
-
 from mindspore import nn
 from ml4co_kit import TaskBase
+from typing import Any, Dict, List
 from ml4co_kit.learning.extra_backends.mindspore import MSBaseModel
-
+from ml4co.ms_utils import ensure_ms_device, move_net_to_device, summarize_net_devices
 from .meta_env import MetaEnv
 from .meta_dataset import MetaDataBatch
-from ml4co.ms_utils import ensure_ms_device, move_net_to_device
 
 
 class MetaPLModel(MSBaseModel):
@@ -51,7 +49,8 @@ class MetaPLModel(MSBaseModel):
         # Checkpoints / CPU-built nets otherwise stay on CPU and Ascend looks "10x slow".
         if weight_path is not None:
             self.load_weights(weight_path)
-        self.to_device()
+        else:
+            self.to_device()
 
     def to_device(self, device: str = None, device_id: int = None):
         """Move this Cell (and nested ``model``) onto ``env.device`` (or override)."""
@@ -59,7 +58,20 @@ class MetaPLModel(MSBaseModel):
             device = self.env.device
         if device_id is None:
             device_id = getattr(self.env, "device_id", 0)
-        move_net_to_device(self, device, device_id=device_id)
+        move_net_to_device(self, device, device_id=device_id, strict=True)
+        # Also move nested backbone explicitly (defensive).
+        if getattr(self, "model", None) is not None:
+            move_net_to_device(self.model, device, device_id=device_id, strict=True)
+        summary = summarize_net_devices(self)
+        print(f"[mindspore] net devices after to_device({device}): {summary}")
+        if summary and device not in summary:
+            raise RuntimeError(
+                f"Expected parameters on {device}, got device summary {summary}"
+            )
+        if len(summary) > 1:
+            raise RuntimeError(
+                f"Parameters split across devices after to_device: {summary}"
+            )
         return self
 
     def load_weights(self, ckpt_path: str):

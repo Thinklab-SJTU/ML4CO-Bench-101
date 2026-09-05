@@ -17,6 +17,7 @@ from .device_utils import (
     move_net_to_device,
     normalize_ms_device,
     set_ms_device,
+    summarize_net_devices,
     tensor_device_target,
 )
 
@@ -30,6 +31,7 @@ __all__ = [
     "ensure_ms_device",
     "maybe_move_tensor",
     "move_net_to_device",
+    "summarize_net_devices",
     "current_ms_device",
     "tensor_device_target",
     "MS_CPU",

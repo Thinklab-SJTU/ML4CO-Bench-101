@@ -101,12 +101,21 @@ class MetaDataBatch(object):
 
         if device is not None:
             device = normalize_ms_device(device)
-        self.node_feature = maybe_move_tensor(self.node_feature, device)
-        self.edge_feature = maybe_move_tensor(self.edge_feature, device)
-        self.edge_index = maybe_move_tensor(self.edge_index, device)
-        self.ground_truth = maybe_move_tensor(self.ground_truth, device)
-        self.batch = maybe_move_tensor(self.batch, device)
-        self.ptr = maybe_move_tensor(self.ptr, device)
+        # strict=True: silent CPU leftover makes Ascend look extremely slow.
+        self.node_feature = maybe_move_tensor(
+            self.node_feature, device, strict=True
+        )
+        self.edge_feature = maybe_move_tensor(
+            self.edge_feature, device, strict=True
+        )
+        self.edge_index = maybe_move_tensor(
+            self.edge_index, device, strict=True
+        )
+        self.ground_truth = maybe_move_tensor(
+            self.ground_truth, device, strict=True
+        )
+        self.batch = maybe_move_tensor(self.batch, device, strict=True)
+        self.ptr = maybe_move_tensor(self.ptr, device, strict=True)
 
     # Alias used by PyTorch code paths
     to_cuda = to_device
@@ -114,7 +123,6 @@ class MetaDataBatch(object):
     @staticmethod
     def _maybe_move(tensor: Tensor, device: str = None) -> Tensor:
         from ml4co.ms_utils import maybe_move_tensor
-
         return maybe_move_tensor(tensor, device)
 
 
