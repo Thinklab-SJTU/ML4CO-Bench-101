@@ -25,7 +25,7 @@ class MetaEnv(BaseEnv):
         set_ms_device(device, device_id=self.device_id)
 
         # Super Args
-        super().__init__(
+        super(MetaEnv, self).__init__(
             name="MetaEnv",
             mode=mode,
             train_batch_size=train_batch_size,
@@ -39,6 +39,9 @@ class MetaEnv(BaseEnv):
         self.train_dataset = train_dataset
         self.test_dataset = test_dataset
 
+    def load_data(self):
+        pass
+    
     def train_dataloader(self):
         # MindSpore DataLoader (single-process; num_workers kept for API parity)
         return MSDataLoader(

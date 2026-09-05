@@ -7,6 +7,7 @@ setup_ld_library_path()
 
 from .skip_ortools import apply as skip_ortools
 from .type_utils import to_numpy, to_tensor
+from .ops_utils import bernoulli
 from .device_utils import (
     MS_ASCEND,
     MS_CPU,
@@ -27,6 +28,7 @@ __all__ = [
     "skip_ortools",
     "to_numpy",
     "to_tensor",
+    "bernoulli",
     "normalize_ms_device",
     "set_ms_device",
     "ensure_ms_device",

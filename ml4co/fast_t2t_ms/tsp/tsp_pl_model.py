@@ -10,6 +10,7 @@ from ml4co.fast_t2t_ms.tsp.tsp_diffusion import TSPDiffusion
 from ml4co.fast_t2t_ms.common.type_utils import to_numpy, to_tensor
 from ml4co.fast_t2t_ms.common import MetaPLModel, MetaDataBatch, InferenceSchedule
 from ml4co.fast_t2t_ms.tsp.lib import c_tsp_greedy, c_tsp_2opt, mindspore_tsp_2opt
+from ml4co.ms_utils.ops_utils import bernoulli
 
 
 class TSPPLModel(MetaPLModel):
@@ -164,7 +165,7 @@ class TSPPLModel(MetaPLModel):
             # Get next st
             if t2 != 0:
                 heatmap = nn.Softmax(axis=-1)(logits)[:, 1]
-                pred_ber = ops.bernoulli(ops.clip_by_value(heatmap, 0.0, 1.0))
+                pred_ber = bernoulli(heatmap)
                 pred_ber_onehot = ops.one_hot(
                     pred_ber.astype(ms.int32),
                     2,
@@ -173,7 +174,7 @@ class TSPPLModel(MetaPLModel):
                 )
                 Q_bar = ms.Tensor(self.diffusion.Q_bar[t2], ms.float32)
                 prob = ops.matmul(pred_ber_onehot.astype(ms.float32), Q_bar)
-                st = ops.bernoulli(ops.clip_by_value(prob[..., 1], 0.0, 1.0))
+                st = bernoulli(prob[..., 1])
 
         # Loss
         loss = self._ce_loss(logits, gt.astype(ms.int32))
@@ -261,7 +262,7 @@ class TSPPLModel(MetaPLModel):
             logits = self.model(points, st, t1_t, edge_index)
             heatmap = nn.Softmax(axis=-1)(logits)[:, 1]
             if t2 != 0:
-                pred_ber = ops.bernoulli(ops.clip_by_value(heatmap, 0.0, 1.0))
+                pred_ber = bernoulli(heatmap)
                 pred_ber_onehot = ops.one_hot(
                     pred_ber.astype(ms.int32),
                     2,
@@ -270,7 +271,7 @@ class TSPPLModel(MetaPLModel):
                 )
                 Q_bar = ms.Tensor(self.diffusion.Q_bar[t2], ms.float32)
                 prob = ops.matmul(pred_ber_onehot.astype(ms.float32), Q_bar)
-                st = ops.bernoulli(ops.clip_by_value(prob[..., 1], 0.0, 1.0))
+                st = bernoulli(prob[..., 1])
 
         # 2.4 Greedy decode
         heatmap = heatmap.reshape(pbs, -1)

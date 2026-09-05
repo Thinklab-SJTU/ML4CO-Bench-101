@@ -1,6 +1,7 @@
 import numpy as np
 import mindspore as ms
 from mindspore import Tensor, ops
+from ml4co.ms_utils.ops_utils import bernoulli
 
 
 class TSPDiffusion(object):
@@ -56,7 +57,7 @@ class TSPDiffusion(object):
             ms.Tensor(0.0, ms.float32),
         )  # (E, 2)
         xt2 = ops.matmul(x_onehot.astype(ms.float32), Q_bar_t2)  # (E, 2)
-        xt2 = ops.bernoulli(ops.clip_by_value(xt2[..., 1], 0.0, 1.0))
+        xt2 = bernoulli(xt2[..., 1])
         xt2_onehot = ops.one_hot(
             xt2.astype(ms.int32),
             2,
@@ -66,7 +67,7 @@ class TSPDiffusion(object):
 
         # xt1
         xt1 = ops.matmul(xt2_onehot.astype(ms.float32), mix_Q_bar)  # (E, 2)
-        xt1 = ops.bernoulli(ops.clip_by_value(xt1[..., 1], 0.0, 1.0))
+        xt1 = bernoulli(xt1[..., 1])
         return xt1, xt2
 
     def sample_single(self, x: Tensor, t: Tensor):
@@ -86,5 +87,5 @@ class TSPDiffusion(object):
             ms.Tensor(0.0, ms.float32),
         )  # (E, 2)
         xt = ops.matmul(x_onehot.astype(ms.float32), Q_bar_t)  # (E, 2)
-        xt = ops.bernoulli(ops.clip_by_value(xt[..., 1], 0.0, 1.0))
+        xt = bernoulli(xt[..., 1])
         return xt

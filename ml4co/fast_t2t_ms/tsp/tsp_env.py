@@ -18,7 +18,7 @@ class TSPEnv(MetaEnv):
         device_id: int = 0,
     ):
         # Super Args
-        super().__init__(
+        super(TSPEnv, self).__init__(
             mode=mode,
             train_batch_size=train_batch_size,
             val_batch_size=val_batch_size,

@@ -75,7 +75,6 @@ if __name__ == "__main__":
         device_target=DEVICE_TARGET,
         device_id=DEVICE_ID,
         max_epochs=MAX_EPOCHS,
-        fp16=False,
         ckpt_filename=ckpt_filename,
         mode="max",
         save_top_k=-1
